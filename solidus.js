@@ -19,8 +19,9 @@ walker.on( 'file', function( root, stat, next ){
 	var path_bits = relative_path.split('.');
 	var route = '/'+ path_bits[0];
 
-	route = route.replace( '/index', '/' ); // replace indexes with base routes
+	route = route.replace( '/index', '' ); // replace indexes with base routes
 	route = route.replace( /{([a-z_-]*)}/ig, ':$1' ); // replace dynamic bits
+	if( route === '' ) route = '/';
 	router.get( route, function( req, res ){
 		res.send( relative_path );
 	});
