@@ -29,4 +29,7 @@ walker.on( 'file', function( root, stat, next ){
 
 });
 
+var assets_path = path.join( __dirname, SITE_DIR, 'assets' );
+
+router.use( express.static( assets_path ) );
 router.listen( 8080 );
