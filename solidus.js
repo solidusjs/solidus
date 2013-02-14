@@ -33,7 +33,10 @@ walker.on( 'file', function( root, stat, next ){
 
 var express_handlebars = require('express3-handlebars');
 
-router.engine( 'hbs', express_handlebars() );
+router.engine( 'hbs', express_handlebars({
+	extname: '.hbs',
+	partialsDir: views_path
+}));
 router.set( 'view engine', 'hbs' );
 router.set( 'views', views_path );
 
