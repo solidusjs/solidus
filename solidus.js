@@ -32,11 +32,14 @@ walker.on( 'file', function( root, stat, next ){
 });
 
 var express_handlebars = require('express3-handlebars');
-
-router.engine( 'hbs', express_handlebars({
+var express_handlebars_config = {
 	extname: '.hbs',
-	partialsDir: views_path
-}));
+	partialsDir: views_path,
+	layoutsDir: views_path
+};
+if( fs.existsSync( path.join( views_path, 'layout.hbs' ) ) ) express_handlebars_config.defaultLayout = 'layout';
+
+router.engine( 'hbs', express_handlebars( express_handlebars_config ));
 router.set( 'view engine', 'hbs' );
 router.set( 'views', views_path );
 
