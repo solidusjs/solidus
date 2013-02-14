@@ -12,6 +12,7 @@ var walker = walk.walk( views_path, {
 	followLinks: false
 });
 
+// Walk through files and create routes
 walker.on( 'file', function( root, stat, next ){
 
 	var absolute_path = path.join( root, stat.name );
@@ -23,12 +24,18 @@ walker.on( 'file', function( root, stat, next ){
 	route = route.replace( /{([a-z_-]*)}/ig, ':$1' ); // replace dynamic bits
 	if( route === '' ) route = '/';
 	router.get( route, function( req, res ){
-		res.send( relative_path );
+		res.render( relative_path );
 	});
 
 	next();
 
 });
+
+var express_handlebars = require('express3-handlebars');
+
+router.engine( 'hbs', express_handlebars() );
+router.set( 'view engine', 'hbs' );
+router.set( 'views', views_path );
 
 var assets_path = path.join( __dirname, SITE_DIR, 'assets' );
 
