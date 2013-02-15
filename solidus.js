@@ -7,6 +7,7 @@ var path = require('path');
 var _ = require('underscore');
 var async = require('async');
 var express = require('express');
+var expose = require('express-expose');
 var router = express();
 var walk = require('walk');
 var request = require('request');
@@ -31,8 +32,12 @@ walker.on( 'file', function( root, stat, next ){
 	if( route === '' ) route = '/';
 	router.get( route, function( req, res ){
 
+		// req.params is actually an array with crap stuck to it
+		// so we have to parse that stuff out into a real object
+		var params = {};
+		for( var key in req.params ) params[key] = req.params[key];
 		var context = {
-			params: req.params,
+			params: params,
 			resources: {}
 		};
 
@@ -57,13 +62,11 @@ walker.on( 'file', function( root, stat, next ){
 							cb();
 						});
 					}, function( err ){
-						context.params = req.params;
 						context.resources = resources_data;
 						callback( context );
 					});
 				}
 				else {
-					context.params = req.params;
 					callback( context );
 				}
 			};
@@ -74,6 +77,7 @@ walker.on( 'file', function( root, stat, next ){
 					var preprocess = require( preprocessor_path );
 					context = preprocess( context );
 				}
+				res.expose( context, 'solidus.context' );
 				res.render( relative_path, context );
 			});
 			
