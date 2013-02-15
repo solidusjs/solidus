@@ -12,6 +12,8 @@ var walk = require('walk');
 var request = require('request');
 
 var views_path = path.join( __dirname, SITE_DIR, 'views' );
+var preprocessors_path = path.join( __dirname, SITE_DIR, 'preprocessors' );
+
 var walker = walk.walk( views_path, {
 	followLinks: false
 });
@@ -41,28 +43,40 @@ walker.on( 'file', function( root, stat, next ){
 			var parameters = ( parameters_exec )? JSON.parse( parameters_exec[1] ): {};
 			var resources = parameters.resources;
 			var resources_data = {};
+			var preprocessor = parameters.preprocessor;
+			var preprocessor_path = path.join( preprocessors_path, preprocessor );
 
-			if( resources ){
-				var resources_array = _( resources ).pairs();
-				async.each( resources_array, function( resource, callback ){
-					request.get( resource[1], function( err, response, body ){
-						if( err ) return callback( err );
-						var data = JSON.parse(body);
-						resources_data[resource[0]] = data;
-						callback();
+			var fetchResources = function( callback ){
+				if( resources ){
+					var resources_array = _( resources ).pairs();
+					async.each( resources_array, function( resource, cb ){
+						request.get( resource[1], function( err, response, body ){
+							if( err ) return cb( err );
+							var data = JSON.parse(body);
+							resources_data[resource[0]] = data;
+							cb();
+						});
+					}, function( err ){
+						context.params = req.params;
+						context.resources = resources_data;
+						callback( context );
 					});
-				}, function( err ){
+				}
+				else {
 					context.params = req.params;
-					context.resources = resources_data;
-					console.log( context );
-					res.render( relative_path, context );
-				});
-			}
-			else {
-				context.params = req.params;
-				console.log( context );
+					callback( context );
+				}
+			};
+
+			fetchResources( function( context ){
+				if( preprocessor ){
+					delete require.cache[preprocessor_path];
+					var preprocess = require( preprocessor_path );
+					context = preprocess( context );
+				}
 				res.render( relative_path, context );
-			}
+			});
+			
 
 		});
 

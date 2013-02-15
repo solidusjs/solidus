@@ -3,7 +3,8 @@
 	"resources": {
 		"global": "http://localhost:8080/api/global.json",
 		"cats": "http://localhost:8080/api/cats.json"
-	}
+	},
+	"preprocessor": "cats.js"
 }
 }}
 
@@ -21,4 +22,10 @@
 	<dd>{{resources.global.global}}</dd>
 	<dt>Cats:</dt>
 	<dd>{{resources.cats.cats}}</dd>
+</dl>
+
+<h2>From the Preprocessor</h2>
+<dl>
+	<dt>Preprocessed:</dt>
+	<dd>{{preprocessed}}</dd>
 </dl>
