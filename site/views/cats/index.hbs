@@ -2,7 +2,8 @@
 {
 	"resources": {
 		"global": "http://localhost:8080/api/global.json",
-		"cats": "http://localhost:8080/api/cats.json"
+		"cats": "http://localhost:8080/api/cats.json",
+		"hats": "http://localhost:8080/api/hats.json"
 	},
 	"preprocessor": "cats.js"
 }
@@ -29,3 +30,6 @@
 	<dt>Preprocessed:</dt>
 	<dd>{{preprocessed}}</dd>
 </dl>
+
+<h2>Hats Partial</h2>
+{{> partials/hats resources.hats}}
