@@ -1,3 +1,20 @@
+{{!
+{
+	"resources": {
+		"global": "http://localhost:8080/api/global.json",
+		"index": "http://localhost:8080/api/index.json"
+	}
+}
+}}
+
 <h1>Index</h1>
 
 <blockquote>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam non est viverra velit mattis placerat. Etiam sed adipiscing eros. Nullam vehicula gravida nibh sit amet gravida. Quisque interdum lacus et odio luctus tempus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean gravida, ipsum ut pulvinar fermentum, lectus sapien iaculis augue, vel malesuada metus elit ut libero. Etiam venenatis magna at augue viverra nec interdum diam consequat. Suspendisse porta enim ut neque tristique iaculis.</blockquote>
+
+<h2>From The Context</h2>
+<dl>
+	<dt>Global:</dt>
+	<dd>{{resources.global.global}}</dd>
+	<dt>Index:</dt>
+	<dd>{{resources.index.index}}</dd>
+</dl>

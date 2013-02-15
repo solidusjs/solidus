@@ -1,3 +1,12 @@
+{{!
+{
+	"resources": {
+		"global": "http://localhost:8080/api/global.json",
+		"cats": "http://localhost:8080/api/cats.json"
+	}
+}
+}}
+
 <h1>Cats Index</h1>
 
 <ul>
@@ -5,3 +14,11 @@
 	<li>Chip</li>
 	<li>Ling Ling</li>
 </ul>
+
+<h2>From The Context</h2>
+<dl>
+	<dt>Global:</dt>
+	<dd>{{resources.global.global}}</dd>
+	<dt>Cats:</dt>
+	<dd>{{resources.cats.cats}}</dd>
+</dl>
