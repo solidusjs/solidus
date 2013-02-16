@@ -5,11 +5,12 @@
 		"express": "3.1.x",
 		"express3-handlebars": "0.2.x",
 		"express-expose": "0.3.x",
-		"handlebars": "<=1.0.7",
+		"handlebars": "1.0.x",
 		"findit": "0.1.x",
 		"walk": "2.2.x",
 		"request": "2.12.x",
 		"underscore": "1.4.x",
-		"async": "0.2.x"
+		"async": "0.2.x",
+		"igneous": "0.1.x"
 	}
 }

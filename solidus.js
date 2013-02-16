@@ -11,6 +11,7 @@ var expose = require('express-expose');
 var router = express();
 var walk = require('walk');
 var request = require('request');
+var igneous = require('igneous');
 
 var views_path = path.join( __dirname, SITE_DIR, 'views' );
 var preprocessors_path = path.join( __dirname, SITE_DIR, 'preprocessors' );
@@ -76,12 +77,11 @@ walker.on( 'file', function( root, stat, next ){
 					delete require.cache[preprocessor_path];
 					var preprocess = require( preprocessor_path );
 					context = preprocess( context );
-				}
+				} console.log( 'expose', context );
 				res.expose( context, 'solidus.context' );
 				res.render( relative_path, context );
 			});
 			
-
 		});
 
 	});
@@ -90,6 +90,22 @@ walker.on( 'file', function( root, stat, next ){
 
 });
 
+var igneous_middleware = igneous({
+	root: path.join( __dirname, SITE_DIR ),
+	minify: false,
+	flows: [{
+		route: 'templates.js',
+		type: 'jst',
+		extensions: ['hbs'],
+		base: '/views',
+		paths: ['/'],
+		jst_lang: 'handlebars',
+		jst_namespace: 'templates'
+	}]
+});
+
+router.use( igneous_middleware );
+
 var express_handlebars = require('express3-handlebars');
 var express_handlebars_config = {
 	extname: '.hbs',
@@ -97,8 +113,9 @@ var express_handlebars_config = {
 	layoutsDir: views_path
 };
 if( fs.existsSync( path.join( views_path, 'layout.hbs' ) ) ) express_handlebars_config.defaultLayout = 'layout';
+var handlebars = express_handlebars.create( express_handlebars_config );
 
-router.engine( 'hbs', express_handlebars( express_handlebars_config ));
+router.engine( 'hbs', handlebars.engine );
 router.set( 'view engine', 'hbs' );
 router.set( 'views', views_path );
 
