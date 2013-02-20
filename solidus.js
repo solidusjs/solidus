@@ -27,61 +27,101 @@ walker.on( 'file', function( root, stat, next ){
 	var relative_path = path.relative( views_path, absolute_path );
 	var path_bits = relative_path.split('.');
 	var route = '/'+ path_bits[0];
-
 	route = route.replace( '/index', '' ); // replace indexes with base routes
 	route = route.replace( /{([a-z_-]*)}/ig, ':$1' ); // replace dynamic bits
 	if( route === '' ) route = '/';
-	router.get( route, function( req, res ){
+	var context = {
+		parameters: {},
+		resources: {}
+	};
 
-		// req.params is actually an array with crap stuck to it
-		// so we have to parse that stuff out into a real object
-		var params = {};
-		for( var key in req.params ) params[key] = req.params[key];
-		var context = {
-			params: params,
-			resources: {}
-		};
+	var extractViewParameters = function( callback ){
 
 		fs.readFile( absolute_path, DEFAULT_ENCODING, function( err, data ){
 
-			var parameters = {};
-			var parameters_exec = /^{{!\s([\S\s]+?)\s}}/.exec( data );
-			var parameters = ( parameters_exec )? JSON.parse( parameters_exec[1] ): {};
-			var resources = parameters.resources;
-			var resources_data = {};
-			var preprocessor = parameters.preprocessor;
+			var params = {};
+			var params_exec = /^{{!\s([\S\s]+?)\s}}/.exec( data );
+			params = ( params_exec )? JSON.parse( params_exec[1] ): {};
+
+			if( callback ) callback( params );
+			
+		});
+
+	};
+
+	var fetchResources = function( resources, callback ){
+
+		var resources_data = {};
+
+		if( resources ){
+			var resources_array = _( resources ).pairs();
+			async.each( resources_array, function( resource, cb ){
+				request.get( resource[1], function( err, response, body ){
+					if( err ) return cb( err );
+					var data = JSON.parse(body);
+					resources_data[resource[0]] = data;
+					cb();
+				});
+			}, function( err ){
+				if( callback ) callback( resources_data );
+			});
+		}
+		else {
+			if( callback ) callback( resources_data );
+		}
+
+	};
+
+	var preprocessContext = function( context, preprocessor ){
+
+		if( preprocessor ){
 			var preprocessor_path = path.join( preprocessors_path, preprocessor );
+			delete require.cache[preprocessor_path];
+			var preprocess = require( preprocessor_path );
+			context = preprocess( context );
+		}
 
-			var fetchResources = function( callback ){
-				if( resources ){
-					var resources_array = _( resources ).pairs();
-					async.each( resources_array, function( resource, cb ){
-						request.get( resource[1], function( err, response, body ){
-							if( err ) return cb( err );
-							var data = JSON.parse(body);
-							resources_data[resource[0]] = data;
-							cb();
-						});
-					}, function( err ){
-						context.resources = resources_data;
-						callback( context );
-					});
-				}
-				else {
-					callback( context );
-				}
-			};
+		return context;
 
-			fetchResources( function( context ){
-				if( preprocessor ){
-					delete require.cache[preprocessor_path];
-					var preprocess = require( preprocessor_path );
-					context = preprocess( context );
-				} console.log( 'expose', context );
+	};
+
+	var renderView = function( req, res, options ){
+
+		options = options || {};
+
+		// req.params is actually an array with crap stuck to it
+		// so we have to parse that stuff out into a real object
+		var parameters = {};
+		for( var key in req.params ) parameters[key] = req.params[key];
+		context.parameters = parameters;
+
+		extractViewParameters( function( parameters ){
+
+			view_params = parameters;
+
+			fetchResources( view_params.resources, function( resources ){
+				context.resources = resources;
+				context = preprocessContext( context, view_params.preprocessor );
+				if( options.json ) return res.json( context );
 				res.expose( context, 'solidus.context' );
 				res.render( relative_path, context );
 			});
 			
+		});
+
+	};
+
+	// serve up the normal page
+	router.get( route, function( req, res ){
+
+		renderView( req, res );
+
+	});
+
+	router.get( route +'.json', function( req, res ){
+
+		renderView( req, res, {
+			json: true
 		});
 
 	});
