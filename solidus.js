@@ -52,12 +52,7 @@ var Page = function( page_path, options ){
 		if( !existing_index ){
 
 			router.routes.get = _( router.routes.get ).reject( function( current_route ){
-				console.log( route === current_route.path );
 				return current_route.path === route;
-			});
-
-			router.get( route, function( req, res ){
-				page.render( req, res );
 			});
 
 			router.get( route +'.json', function( req, res ){
@@ -66,11 +61,15 @@ var Page = function( page_path, options ){
 				});
 			});
 
+			router.get( route, function( req, res ){
+				page.render( req, res );
+			});
+
 		}
 		else {
 			page.route = null;
 		}
-console.log( _( router.routes.get ).pluck('path') );
+
 		return route;
 
 	};
