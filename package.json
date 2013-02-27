@@ -11,6 +11,10 @@
 		"request": "2.12.x",
 		"underscore": "1.4.x",
 		"async": "0.2.x",
-		"igneous": "0.1.x"
+		"igneous": "0.1.x",
+		"commander": "1.1.x"
+	},
+	"bin": {
+		"solidus": "./bin/solidus"
 	}
 }

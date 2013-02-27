@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+
+program.usage('[command] [option]');
+
+program
+	.command('start')
+	.option( '-p, --port [type]', 'port for server to listen on [8080]', 8080 )
+	.description('Start Solidus')
+	.action( function( env ){
+		var solidus = require('../solidus.js');
+		solidus.start({
+			port: env.port
+		});
+		//process.exit();
+	});
+
+program.parse( process.argv );
