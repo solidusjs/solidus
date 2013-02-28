@@ -13,6 +13,7 @@ var router = express();
 var chokidar = require('chokidar');
 var request = require('request');
 var handlebars = require('handlebars');
+var Page = require('./lib/page.js');
 
 var views_path = path.join( SITE_DIR, 'views' );
 var preprocessors_path = path.join( SITE_DIR, 'preprocessors' );
@@ -27,10 +28,10 @@ solidus.start = function( options ){
 	options = _( options ).defaults( defaults );
 
 	var watcher = chokidar.watch( views_path, {
-		persistent: true
+		persistent: true,
+		ignored: /^\./
 	});
 
-	var Page = require('./lib/page.js');
 	Page.config({
 		router: router,
 		views_path: views_path,
