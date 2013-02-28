@@ -94,7 +94,6 @@ solidus.start = function( options ){
 	var api_mock_path = path.join( __dirname, API_MOCK_DIR );
 
 	router.use( express.static( assets_path ) );
-	router.use( '/api', express.static( api_mock_path ) );
 	router.listen( options.port );
 
 	console.log( 'Solidus server running on port '+ options.port );
