@@ -47,6 +47,13 @@ solidus.start = function( options ){
 
 	});
 
+	watcher.on( 'change', function( path ){
+
+		var page = pages[path];
+		if( page ) page.parsePage();
+
+	});
+
 	watcher.on( 'remove', function( path ){
 
 		// remove this page
