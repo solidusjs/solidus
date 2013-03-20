@@ -12,7 +12,6 @@ var expose = require('express-expose');
 var router = express();
 var chokidar = require('chokidar');
 var request = require('request');
-var handlebars = require('handlebars');
 var Page = require('./lib/page.js');
 
 var views_path = path.join( SITE_DIR, 'views' );
@@ -44,8 +43,6 @@ solidus.start = function( options ){
 		var page = new Page( path );
 		pages[path] = page;
 
-		compileTemplates();
-
 	});
 
 	watcher.on( 'change', function( path ){
@@ -62,8 +59,6 @@ solidus.start = function( options ){
 		pages[path].destroy();
 		delete pages[path];
 
-		compileTemplates();
-
 	});
 
 	var express_handlebars = require('express3-handlebars');
@@ -75,25 +70,6 @@ solidus.start = function( options ){
 	if( fs.existsSync( path.join( views_path, 'layout.hbs' ) ) ) express_handlebars_config.defaultLayout = 'layout';
 	var handlebars = express_handlebars.create( express_handlebars_config );
 
-	var compileTemplates = function(){
-
-		handlebars.loadPartials({
-			precompiled: true,
-			wrapped: true
-		}, function( err, partials ){
-
-			templates_string = 'Handlebars.templates = Handlebars.partials = {';
-			for( var key in partials ){
-				templates_string += '"'+ key +'": '+ partials[key].toString() +',';
-			}
-			templates_string = templates_string.slice( 0, -1 );
-			templates_string +='}';
-			templates_string = templates_string.replace( /<\/script>/ig, '</scr"+"ipt>' ); // are you kidding me? http://stackoverflow.com/questions/1659749/script-tag-in-javascript-string
-
-		});
-
-	};
-
 	router.engine( 'hbs', handlebars.engine );
 	router.set( 'view engine', 'hbs' );
 	router.set( 'views', views_path );
@@ -104,7 +80,7 @@ solidus.start = function( options ){
 	router.use( express.static( assets_path ) );
 	router.listen( options.port );
 
-	console.log( 'Solidus server running on port '+ options.port );
+	console.log( '[SOLIDUS] Server running on port '+ options.port );
 
 };
 
