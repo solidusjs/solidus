@@ -12,6 +12,7 @@ var expose = require('express-expose');
 var router = express();
 var chokidar = require('chokidar');
 var request = require('request');
+var colors = require('colors');
 var Page = require('./lib/page.js');
 
 var views_path = path.join( SITE_DIR, 'views' );
@@ -28,7 +29,7 @@ solidus.start = function( options ){
 
 	var watcher = chokidar.watch( views_path, {
 		persistent: true,
-		ignored: /^\./
+		ignored: /(^\.)|(\/\.)/
 	});
 
 	Page.config({
@@ -41,7 +42,6 @@ solidus.start = function( options ){
 	watcher.on( 'add', function( path ){
 
 		var page = new Page( path );
-		pages[path] = page;
 
 	});
 
@@ -80,7 +80,7 @@ solidus.start = function( options ){
 	router.use( express.static( assets_path ) );
 	router.listen( options.port );
 
-	console.log( '[SOLIDUS] Server running on port '+ options.port );
+	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ options.port );
 
 };
 
