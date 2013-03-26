@@ -38,26 +38,42 @@ solidus.start = function( options ){
 		preprocessors_path: preprocessors_path
 	});
 	var pages = Page.pages;
+	var layouts = Page.layouts;
 
-	watcher.on( 'add', function( path ){
+	watcher.on( 'add', function( file_path ){
 
-		var page = new Page( path );
+		var path_to = path.relative( views_path, file_path );
+		var dir_to = path.dirname( path_to );
+		var name = path.basename( file_path, '.hbs' );
+		if( name === 'layout' && dir_to !== '.' ){
+			layouts[dir_to] = true;
+		}
+		else {
+			var page = new Page( file_path );
+		}
 
 	});
 
-	watcher.on( 'change', function( path ){
+	watcher.on( 'change', function( file_path ){
 
-		var page = pages[path];
+		var page = pages[file_path];
 		if( page ) page.parsePage();
 
 	});
 
-	watcher.on( 'remove', function( path ){
+	watcher.on( 'remove', function( file_path ){
 
-		// remove this page
-
-		pages[path].destroy();
-		delete pages[path];
+		// remove this page or layout
+		var path_to = path.relative( views_path, file_path );
+		var dir_to = path.dirname( path_to );
+		var name = path.basename( file_path, '.hbs' );
+		if( name === 'layout' && dir_to !== '.' ){
+			delete layouts[dir_to];
+		}
+		else {
+			pages[file_path].destroy();
+			delete pages[file_path];
+		}
 
 	});
 
