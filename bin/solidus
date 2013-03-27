@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-var program = require('commander');
+var grunt = require('grunt');
+var commander = require('commander');
 
-program.usage('[command] [option]');
+commander.usage('[command] [option]');
 
-program
+commander
 	.command('start')
 	.option( '-p, --port [type]', 'port for server to listen on [8080]', 8080 )
 	.description('Start Solidus')
@@ -16,4 +17,14 @@ program
 		//process.exit();
 	});
 
-program.parse( process.argv );
+commander
+	.command('*')
+	.action( function(){
+		//var gruntfile = require('../Gruntfile.js');
+		//gruntfile( grunt );
+		grunt.solidus_cwd = process.cwd();
+		process.chdir( __dirname );
+		grunt.cli();
+	});
+
+commander.parse( process.argv );

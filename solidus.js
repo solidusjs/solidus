@@ -99,10 +99,15 @@ solidus.start = function( options ){
 
 	// Set up redirects
 	fs.readFile( 'redirects.json', 'UTF8', function( err, data ){
+		var status = 301;
+		if( !data ) return;
 		var redirects = JSON.parse( data );
 		for( var i in redirects ){
+			if( redirects[i].start || redirects[i].end ){
+				status = 302;
+			}
 			router.get( redirects[i].from, function( req, res ){
-				res.redirect( redirects[i].to );
+				res.redirect( status, redirects[i].to );
 			});
 		}
 	});
