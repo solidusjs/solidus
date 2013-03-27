@@ -27,6 +27,7 @@ solidus.start = function( options ){
 	};
 	options = _( options ).defaults( defaults );
 
+	// Loop through our views directory and create Page objects for each valid view
 	var watcher = chokidar.watch( views_path, {
 		persistent: true,
 		ignored: /(^\.)|(\/\.)/
@@ -40,6 +41,7 @@ solidus.start = function( options ){
 	var pages = Page.pages;
 	var layouts = Page.layouts;
 
+	// Add a new Page any time a file is added to the views path
 	watcher.on( 'add', function( file_path ){
 
 		var path_to = path.relative( views_path, file_path );
@@ -54,6 +56,7 @@ solidus.start = function( options ){
 
 	});
 
+	// Update the Page when the view's contents are modified
 	watcher.on( 'change', function( file_path ){
 
 		var page = pages[file_path];
@@ -61,6 +64,7 @@ solidus.start = function( options ){
 
 	});
 
+	// Remove the page when its view is deleted
 	watcher.on( 'remove', function( file_path ){
 
 		// remove this page or layout
@@ -77,6 +81,7 @@ solidus.start = function( options ){
 
 	});
 
+	// Set up Express server
 	var express_handlebars = require('express3-handlebars');
 	var express_handlebars_config = {
 		extname: '.hbs',
@@ -89,11 +94,19 @@ solidus.start = function( options ){
 	router.engine( 'hbs', handlebars.engine );
 	router.set( 'view engine', 'hbs' );
 	router.set( 'views', views_path );
-
 	var assets_path = path.join( SITE_DIR, 'assets' );
-	var api_mock_path = path.join( __dirname, API_MOCK_DIR );
-
 	router.use( express.static( assets_path ) );
+
+	// Set up redirects
+	fs.readFile( 'redirects.json', 'UTF8', function( err, data ){
+		var redirects = JSON.parse( data );
+		for( var i in redirects ){
+			router.get( redirects[i].from, function( req, res ){
+				res.redirect( redirects[i].to );
+			});
+		}
+	});
+
 	router.listen( options.port );
 
 	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ options.port );
