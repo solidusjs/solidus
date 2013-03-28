@@ -95,10 +95,12 @@ module.exports = function( grunt ){
 	});
 
 	grunt.registerTask( 'server', 'Start the Solidus server', function(){
-		console.log('Starting Solidus server...');
+		var port = grunt.option('port') || grunt.option('p');
+		var args = ['start'];
+		if( port ) args = args.concat([ '-p', port ]);
 		grunt.util.spawn({
 			cmd: 'solidus',
-			args: ['start'],
+			args: args,
 			opts: {
 				stdio: 'inherit'
 			}
