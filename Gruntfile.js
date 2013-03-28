@@ -95,18 +95,13 @@ module.exports = function( grunt ){
 	});
 
 	grunt.registerTask( 'server', 'Start the Solidus server', function(){
-		var child_process = require('child_process');
-		var spawn = child_process.spawn;
-		var server = spawn( 'solidus', ['start'] );
 		console.log('Starting Solidus server...');
-		server.stderr.on( 'data', function( data ){
-			console.error( data.toString() );
-		});
-		server.stdout.on( 'data', function( data ){
-			console.log( data.toString() );
-		});
-		process.on( 'exit', function(){
-			server.kill();
+		grunt.util.spawn({
+			cmd: 'solidus',
+			args: ['start'],
+			opts: {
+				stdio: 'inherit'
+			}
 		});
 	});
 
