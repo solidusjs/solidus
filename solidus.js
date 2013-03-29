@@ -16,6 +16,7 @@ var colors = require('colors');
 var Page = require('./lib/page.js');
 
 var views_path = path.join( SITE_DIR, 'views' );
+var redirects_path = path.join( SITE_DIR, 'redirects.json' );
 var preprocessors_path = path.join( SITE_DIR, 'preprocessors' );
 
 var solidus = {};
@@ -28,7 +29,7 @@ solidus.start = function( options ){
 	options = _( options ).defaults( defaults );
 
 	// Loop through our views directory and create Page objects for each valid view
-	var watcher = chokidar.watch( views_path, {
+	var view_watcher = chokidar.watch( views_path, {
 		persistent: true,
 		ignored: /(^\.)|(\/\.)/
 	});
@@ -42,7 +43,7 @@ solidus.start = function( options ){
 	var layouts = Page.layouts;
 
 	// Add a new Page any time a file is added to the views path
-	watcher.on( 'add', function( file_path ){
+	view_watcher.on( 'add', function( file_path ){
 
 		var path_to = path.relative( views_path, file_path );
 		var dir_to = path.dirname( path_to );
@@ -57,7 +58,7 @@ solidus.start = function( options ){
 	});
 
 	// Update the Page when the view's contents are modified
-	watcher.on( 'change', function( file_path ){
+	view_watcher.on( 'change', function( file_path ){
 
 		var page = pages[file_path];
 		if( page ) page.parsePage();
@@ -65,7 +66,7 @@ solidus.start = function( options ){
 	});
 
 	// Remove the page when its view is deleted
-	watcher.on( 'remove', function( file_path ){
+	view_watcher.on( 'unlink', function( file_path ){
 
 		// remove this page or layout
 		var path_to = path.relative( views_path, file_path );
@@ -78,6 +79,61 @@ solidus.start = function( options ){
 			pages[file_path].destroy();
 			delete pages[file_path];
 		}
+
+	});
+
+	// Watch our redirects file for changes
+	var redirect_routes = [];
+
+	var redirects_watcher = chokidar.watch( redirects_path, {
+		persistent: true
+	});
+
+	var createRedirect = function( redirect ){
+		var status = 302;
+		var route = path.normalize( redirect.from );
+		if( redirect.start || redirect.end ){
+			status = 302;
+		}
+		router.get( route, function( req, res ){
+			res.redirect( status, redirect.to );
+		});
+		redirect_routes.push( route );
+	};
+
+	var clearRedirects = function(){
+		router.routes.get = _( router.routes.get ).reject( function( current_route ){
+			var matching_route = redirect_routes.indexOf( current_route.path ) > -1;
+			if( matching_route ) redirect_routes = _( redirect_routes ).without( current_route.path );
+			if( matching_route ) console.log( current_route.path );
+			return matching_route;
+		});
+	};
+
+	redirects_watcher.on( 'add', function( file_path ){
+
+		fs.readFile( file_path, DEFAULT_ENCODING, function( err, data ){
+			if( !data ) return;
+			var redirects = JSON.parse( data );
+			for( var i in redirects ) createRedirect( redirects[i] );
+		});
+
+	});
+
+	redirects_watcher.on( 'change', function( file_path ){
+
+		fs.readFile( file_path, DEFAULT_ENCODING, function( err, data ){
+			if( !data ) return;
+			var redirects = JSON.parse( data );
+			clearRedirects();
+			for( var i in redirects ) createRedirect( redirects[i] );
+		});
+
+	});
+
+	redirects_watcher.on( 'unlink', function( file_path ){
+
+		clearRedirects();
 
 	});
 
@@ -96,21 +152,6 @@ solidus.start = function( options ){
 	router.set( 'views', views_path );
 	var assets_path = path.join( SITE_DIR, 'assets' );
 	router.use( express.static( assets_path ) );
-
-	// Set up redirects
-	fs.readFile( 'redirects.json', 'UTF8', function( err, data ){
-		var status = 301;
-		if( !data ) return;
-		var redirects = JSON.parse( data );
-		for( var i in redirects ){
-			if( redirects[i].start || redirects[i].end ){
-				status = 302;
-			}
-			router.get( redirects[i].from, function( req, res ){
-				res.redirect( status, redirects[i].to );
-			});
-		}
-	});
 
 	router.listen( options.port );
 
