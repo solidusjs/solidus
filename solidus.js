@@ -91,7 +91,7 @@ solidus.start = function( options ){
 
 	var createRedirect = function( redirect ){
 		var status = 302;
-		var route = path.normalize( redirect.from );
+		var route = path.normalize( redirect.from ).replace( /\\/g, '/' );
 		if( redirect.start || redirect.end ){
 			status = 302;
 		}
