@@ -136,7 +136,7 @@ Here's a quick outline of how resources work:
 Context in `kitties/index.hbs`
 ```json
 {
-	resources: {
+	"resources": {
 		"kitties": {
 			"count": 3,
 			"results": ['Wesley','Twizzler','Pixel']
@@ -164,3 +164,37 @@ for( var i in data.resources.kitties.results ){
 ```
 
 The context is automatically passed in as `data`, and any changes made to it will be reflected in the context given to the page.
+
+-----
+
+### Assets
+
+Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, or more. Just place your assets in the `assets` directory, and solidus will serve them up. While solidus does serve anything in the assets folder, there are a couple conventions that you should follow. First, all JavaScript files belong in the `scripts` directory, and all CSS in the `styles` directory. These directories have special significance, and their contents are used to produce the final compiled files when solidus sites are served live. Here's an example of the folder structure solidus assets:
+
+```
+assets
+|-images
+  |-kitties.png
+|-scripts
+  |-vendors
+    |-jquery.js
+  |--index.js
+  |--kitties.js
+|-styles
+  |-index.sass
+  |-kitties.sass
+```
+
+After `solidus compile` or `solidus dev` are run, a new folder is created with the compiled scripts, styles, and templates of the site.
+
+```
+assets
+|-compiled
+  |-partials.js
+  |-scripts.js
+  |-styles.css
+  |-templates.js
+...
+```
+
+When building a site, you should always try to use the compiled assets, as they will be optimized for distribution. Other assets, such as fonts and images, have no compilation step and can be used as is.
