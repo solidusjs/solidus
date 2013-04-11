@@ -52,6 +52,8 @@ solidus dev --port 9001
 
 Solidus sites are comprised of a **views**, **resources**, and **assets**. **Views** are [Handlebars.js](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, Hipster, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
 
+-----
+
 ### Views
 The views directory contains every page, partial, and layout for a site. Layouts are any view that has the name `layout.hbs`. By default, pages will inherit the closest layout and use it, up to the root views directory. Partials and pages are identical and only differ in usage: you can use any view as a partial, and any view as a page.
 
@@ -64,8 +66,8 @@ Every view in the view folder is available as a page. The routes of these pages 
 
 **Dynamic segments** can be defined by using curly braces `{}` in the view's filename. A dynamic segment is a placeholder for something variable, like a page number or ID. Here are some examples of views with dynamic segments:
 
-- `views/doggies/{dog}` becomes `/doggies/ein`, `/doggies/marmaduke`, `/doggies/pixel`
-- `views/articles/{article_id}` becomes `/articles/582890`, `/articles/582811`, `/articles/600345`
+- `views/doggies/{dog}.hbs` becomes `/doggies/ein`, `/doggies/marmaduke`, `/doggies/pixel`
+- `views/articles/{article_id}.hbs` becomes `/articles/582890`, `/articles/582811`, `/articles/600345`
 
 **Page configuration** is done with a JSON object nested within a Handlebars comment at the top of a page view. This object can contain the following:
 
@@ -106,3 +108,53 @@ Then you can use your templates like so:
 var markup = solidus.templates['kitties/index']( data );
 $('body').append( markup );
 ```
+
+-----
+
+### Resources
+
+Instead of keeping content in a database, solidus relies on external APIs for information. Solidus takes JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page. While API responses can be used directly, it is **highly recommended** that [Hipster](http://hipster-tools.sparkart.net) is used to proxy the requests first.
+
+Here's a quick outline of how resources work:
+
+1) A resource is added to the configuration object of a page view:
+
+```html
+...
+	"resources": {
+		"kitties": "https://hipster-tools.herokuapp.com/hipster/v1/resources/5632ac/tims-favorite-kitties"
+	}
+...
+```
+
+2) When the page is requested, the resources are requested and their data is added to the `resources` object in the page's context. It looks something like this:
+
+```json
+{
+	resources: {
+		"kitties": {
+			"count": 3,
+			"results": ['Wesley','Twizzler','Pixel']
+		}
+	}
+}
+```
+
+3) The context can also be made available to client side JavaScript like so:
+
+```html
+<script>{{{context}}}</script>
+<script>
+	alert( 'Here are the kitties!', solidus.context.resources.kitties.results );
+</script>
+```
+
+If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessors` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
+
+```javascript
+for( var i in data.resources.kitties.results ){
+	data.resources.kitties.results[i] = data.resources.kitties.results[i].toUpperCase();
+}
+```
+
+The context is automatically passed in as `data`, and any changes made to it will be reflected in the context given to the page.
