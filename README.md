@@ -55,9 +55,9 @@ Solidus sites are comprised of a **views**, **resources**, and **assets**. **Vie
 -----
 
 ### Views
-The views directory contains every page, partial, and layout for a site. Layouts are any view that has the name `layout.hbs`. By default, pages will inherit the closest layout and use it, up to the root views directory. Partials and pages are identical and only differ in usage: you can use any view as a partial, and any view as a page.
+The `views` directory contains every *page*, *partial*, and *layout* in a site. Any view with the name `layout.hbs` will automatically become a *layout*. By default, *pages* will inherit the closest *layout* and use it, up to the root of the `views` directory. *Partials* and *pages* are identical and only differ in usage: you can use any view as a partial, and any view as a page.
 
-Every view in the view folder is available as a page. The routes of these pages are generated from their filename and location in the views directory. Here's a quick example:
+Every view in the `views` directory is available as a page. The routes of these pages are generated from their filename and location in the views directory. Here's a quick example:
 
 - `views/index.hbs` becomes `/`
 - `views/about.hbs` becomes `/about`
@@ -73,7 +73,7 @@ Every view in the view folder is available as a page. The routes of these pages 
 
 - **title** - The title of the page. This is generally used to populate the `<title>` tag.
 - **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
-- **preprocessor** - The name of the preprocessor to use for this page.
+- **preprocessor** - The path to the preprocessor to use for this page. Relative to 
 
 Here's a quick example of what a page configuration might look like:
 
@@ -100,16 +100,14 @@ All of a site's views can be accessed client-side as **JavaScript Templates**. S
 		<script src="/scripts/vendor/handlebars.js"></script>
 		<script src="/compiled/templates.js"></script>
 		<script src="/compiled/partials.js"></script>
+		<script>
+			var markup = solidus.templates['kitties/index']( data );
+			$( function(){
+				$('body').append( markup );
+			});
+		</script>
 	</head>
 </html>
-```
-
-Then you can use your templates like so:
-
-`index.hbs`
-```javascript
-var markup = solidus.templates['kitties/index']( data );
-$('body').append( markup );
 ```
 
 -----
@@ -131,9 +129,9 @@ Here's a quick outline of how resources work:
 ...
 ```
 
-2) When the page is requested, the resources are requested and their data is added to the `resources` object in the page's context. It looks something like this:
+2) When the page is requested, the resources are fetched and their data is added to the `resources` object in the page's context. It looks something like this:
 
-Context in `kitties/index.hbs`
+Context in `/kitties`
 ```json
 {
 	"resources": {
@@ -163,7 +161,29 @@ for( var i in data.resources.kitties.results ){
 }
 ```
 
-The context is automatically passed in as `data`, and any changes made to it will be reflected in the context given to the page.
+`views/kitties/index.hbs`
+```html
+...
+	"resources": {
+		"kitties": "https://hipster-tools.herokuapp.com/hipster/v1/resources/5632ac/tims-favorite-kitties"
+	},
+	"preprocessor": "kitties.js"
+...
+```
+
+Context in `/kitties`
+```json
+{
+	"resources": {
+		"kitties": {
+			"count": 3,
+			"results": ['WESLEY','TWIZZER','PIXEL']
+		}
+	}
+}
+```
+
+The context is automatically passed in as `data`, and any changes made to it will be reflected in the context used in the page.
 
 -----
 
@@ -197,4 +217,4 @@ assets
 ...
 ```
 
-When building a site, you should always try to use the compiled assets, as they will be optimized for distribution. Other assets, such as fonts and images, have no compilation step and can be used as is.
+At the moment, assets will be compiled in the order they appear in the filesystem. When building a site, you should always try to use the compiled assets, as they will be optimized for distribution. Other assets, such as fonts and images, have no compilation step and can be used as is.
