@@ -77,6 +77,7 @@ Every view in the view folder is available as a page. The routes of these pages 
 
 Here's a quick example of what a page configuration might look like:
 
+`index.hbs`
 ```html
 {{!
 	{
@@ -92,6 +93,7 @@ Here's a quick example of what a page configuration might look like:
 
 All of a site's views can be accessed client-side as **JavaScript Templates**. Since views are just [Handlebars.js](http://handlebarsjs.com/) templates, all you need to do is include Handlebars, include your templates, and use them. Javascript templates, along with anything else solidus makes available client-side, is on the `solidus` namespace. Here's a quick example of how it works:
 
+`index.hbs`
 ```html
 <html>
 	<head>
@@ -104,6 +106,7 @@ All of a site's views can be accessed client-side as **JavaScript Templates**. S
 
 Then you can use your templates like so:
 
+`index.hbs`
 ```javascript
 var markup = solidus.templates['kitties/index']( data );
 $('body').append( markup );
@@ -119,6 +122,7 @@ Here's a quick outline of how resources work:
 
 1) A resource is added to the configuration object of a page view:
 
+`kitties/index.hbs`
 ```html
 ...
 	"resources": {
@@ -129,6 +133,7 @@ Here's a quick outline of how resources work:
 
 2) When the page is requested, the resources are requested and their data is added to the `resources` object in the page's context. It looks something like this:
 
+Context in `kitties/index.hbs`
 ```json
 {
 	resources: {
@@ -151,6 +156,7 @@ Here's a quick outline of how resources work:
 
 If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessors` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
+`preprocessors/kitties.js`
 ```javascript
 for( var i in data.resources.kitties.results ){
 	data.resources.kitties.results[i] = data.resources.kitties.results[i].toUpperCase();
