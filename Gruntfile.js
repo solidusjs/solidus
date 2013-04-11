@@ -24,7 +24,8 @@ module.exports = function( grunt ){
 			dev: {
 				options: {
 					lineNumbers: true,
-					style: 'expanded'
+					style: 'expanded',
+					quiet: true
 				},
 				files: {
 					'assets/compiled/styles_tmp.css': ['assets/compiled/styles.scss']
@@ -65,7 +66,7 @@ module.exports = function( grunt ){
 				}
 			}
 		},
-		regarde: {
+		watch: {
 			styles: {
 				files: ['assets/styles/**/*.scss','assets/styles/**/*.css','assets/styles/**/*.sass'],
 				tasks: ['compilecss']
@@ -77,14 +78,10 @@ module.exports = function( grunt ){
 			scripts: {
 				files: ['assets/scripts/**/*.js'],
 				tasks: ['compilejs']
-			},
-			reload: {
-				files: ['assets/compiled/styles.css'],
-				tasks: ['livereload']
 			}
 		},
 		clean: {
-			sass: ['assets/compiled/styles.scss','assets/compiled/styles_tmp.css'],
+			sass: ['assets/compiled/styles.scss','assets/compiled/styles_tmp.css']
 		}
 	});
 	
@@ -112,7 +109,7 @@ module.exports = function( grunt ){
 	grunt.registerTask( 'compilehbs', ['handlebars'] );
 	grunt.registerTask( 'compilejs', ['concat:js'] );
 	grunt.registerTask( 'compilecss', ['concat:css','sass','copy','clean:sass'] );
-	grunt.registerTask( 'dev', ['compile','livereload-start','server','regarde' ] );
+	grunt.registerTask( 'dev', [ 'compile','server','watch' ] );
 
 	process.chdir( grunt.solidus_cwd );
 
