@@ -76,8 +76,11 @@ solidus.start = function( options ){
 			delete layouts[dir_to];
 		}
 		else {
-			pages[file_path].destroy();
-			delete pages[file_path];
+			var page = pages[file_path];
+			if( page ){
+				page.destroy();
+				delete pages[file_path];
+			}
 		}
 
 	});
