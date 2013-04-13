@@ -21,12 +21,24 @@ var preprocessors_path = path.join( SITE_DIR, 'preprocessors' );
 
 var solidus = {};
 
+// Start the solidus server
 solidus.start = function( options ){
 
 	var defaults = {
 		port: DEFAULT_PORT
 	};
-	options = _( options ).defaults( defaults );
+	solidus.options = options = _( options ).defaults( defaults );
+
+	this.setupPages();
+	this.setupRedirects();
+	this.setupServer({
+		port: options.port
+	});
+
+};
+
+// Set up page routes
+solidus.setupPages = function(){
 
 	// Loop through our views directory and create Page objects for each valid view
 	var view_watcher = chokidar.watch( views_path, {
@@ -85,40 +97,24 @@ solidus.start = function( options ){
 
 	});
 
-	// Watch our redirects file for changes
-	var redirect_routes = [];
+};
+
+// Set up redirect routes
+solidus.setupRedirects = function(){
+
+	this.redirect_routes = [];
 
 	var redirects_watcher = chokidar.watch( redirects_path, {
-		persistent: true
+		persistent: true,
+		ignored: /(^\.)|(\/\.)/
 	});
-
-	var createRedirect = function( redirect ){
-		var status = 302;
-		var route = path.normalize( redirect.from ).replace( /\\/g, '/' );
-		if( redirect.start || redirect.end ){
-			status = 302;
-		}
-		router.get( route, function( req, res ){
-			res.redirect( status, redirect.to );
-		});
-		redirect_routes.push( route );
-	};
-
-	var clearRedirects = function(){
-		router.routes.get = _( router.routes.get ).reject( function( current_route ){
-			var matching_route = redirect_routes.indexOf( current_route.path ) > -1;
-			if( matching_route ) redirect_routes = _( redirect_routes ).without( current_route.path );
-			if( matching_route ) console.log( current_route.path );
-			return matching_route;
-		});
-	};
 
 	redirects_watcher.on( 'add', function( file_path ){
 
 		fs.readFile( file_path, DEFAULT_ENCODING, function( err, data ){
 			if( !data ) return;
 			var redirects = JSON.parse( data );
-			for( var i in redirects ) createRedirect( redirects[i] );
+			for( var i in redirects ) solidus.createRedirect( redirects[i] );
 		});
 
 	});
@@ -128,17 +124,49 @@ solidus.start = function( options ){
 		fs.readFile( file_path, DEFAULT_ENCODING, function( err, data ){
 			if( !data ) return;
 			var redirects = JSON.parse( data );
-			clearRedirects();
-			for( var i in redirects ) createRedirect( redirects[i] );
+			solidus.clearRedirects();
+			for( var i in redirects ) solidus.createRedirect( redirects[i] );
 		});
 
 	});
 
 	redirects_watcher.on( 'unlink', function( file_path ){
 
-		clearRedirects();
+		solidus.clearRedirects();
 
 	});
+
+};
+
+solidus.createRedirect = function( redirect ){
+
+	var status = 302;
+	var route = path.normalize( redirect.from ).replace( /\\/g, '/' );
+	if( redirect.start || redirect.end ){
+		status = 302;
+	}
+	router.get( route, function( req, res ){
+		res.redirect( status, redirect.to );
+	});
+	this.redirect_routes.push( route );
+
+};
+
+solidus.clearRedirects = function(){
+
+	router.routes.get = _( router.routes.get ).reject( function( current_route ){
+		var matching_route = solidus.redirect_routes.indexOf( current_route.path ) > -1;
+		if( matching_route ) solidus.redirect_routes = _( solidus.redirect_routes ).without( current_route.path );
+		if( matching_route ) console.log( current_route.path );
+		return matching_route;
+	});
+
+};
+
+// Setup the express server
+solidus.setupServer = function( params ){
+
+	params = params || {};
 
 	// Set up Express server
 	var express_handlebars = require('express3-handlebars');
@@ -156,9 +184,9 @@ solidus.start = function( options ){
 	var assets_path = path.join( SITE_DIR, 'assets' );
 	router.use( express.static( assets_path ) );
 
-	router.listen( options.port );
+	router.listen( params.port );
 
-	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ options.port );
+	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
 
 };
 
