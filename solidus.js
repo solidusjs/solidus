@@ -156,8 +156,8 @@ solidus.clearRedirects = function(){
 
 	router.routes.get = _( router.routes.get ).reject( function( current_route ){
 		var matching_route = solidus.redirect_routes.indexOf( current_route.path ) > -1;
+		// probably shouldn't be doing this
 		if( matching_route ) solidus.redirect_routes = _( solidus.redirect_routes ).without( current_route.path );
-		if( matching_route ) console.log( current_route.path );
 		return matching_route;
 	});
 
