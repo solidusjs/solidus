@@ -151,11 +151,21 @@ solidus.start = function( options ){
 	var handlebars = express_handlebars.create( express_handlebars_config );
 
 	router.engine( 'hbs', handlebars.engine );
+	router.enable('verbose errors');
 	router.set( 'view engine', 'hbs' );
 	router.set( 'views', views_path );
 	var assets_path = path.join( SITE_DIR, 'assets' );
 	router.use( express.static( assets_path ) );
-
+	router.use( router.router );
+	router.use( function( req, res ){
+		res.status( 404 );
+		if( req.accepts('html') ){
+			res.render('404');
+		}
+		else if( req.accepts('json') ){
+			res.json({ error: 'Not Found'});
+		}
+	});
 	router.listen( options.port );
 
 	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ options.port );
