@@ -7,9 +7,11 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var async = require('async');
+var http = require('http');
 var express = require('express');
 var expose = require('express-expose');
 var router = express();
+var server = http.createServer( router );
 var chokidar = require('chokidar');
 var request = require('request');
 var colors = require('colors');
@@ -27,8 +29,8 @@ solidus.start = function( options ){
 	var defaults = {
 		port: DEFAULT_PORT
 	};
-	solidus.options = options = _( options ).defaults( defaults );
-
+	solidus.options = options = _( options || {} ).defaults( defaults );
+console.log( options );
 	this.setupPages();
 	this.setupRedirects();
 	this.setupServer({
@@ -184,9 +186,16 @@ solidus.setupServer = function( params ){
 	var assets_path = path.join( SITE_DIR, 'assets' );
 	router.use( express.static( assets_path ) );
 
-	router.listen( params.port );
+	server.listen( params.port );
 
 	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
+
+};
+
+// Stop the express server
+solidus.stop = function(){
+
+	server.close();	
 
 };
 
