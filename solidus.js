@@ -27,10 +27,11 @@ var solidus = {};
 solidus.start = function( options ){
 
 	var defaults = {
-		port: DEFAULT_PORT
+		port: DEFAULT_PORT,
+		log_level: 1
 	};
 	solidus.options = options = _( options || {} ).defaults( defaults );
-console.log( options );
+
 	this.setupPages();
 	this.setupRedirects();
 	this.setupServer({
@@ -188,7 +189,7 @@ solidus.setupServer = function( params ){
 
 	server.listen( params.port );
 
-	console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
+	if( solidus.options.log_level >= 1 ) console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
 
 };
 

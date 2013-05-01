@@ -3,7 +3,9 @@ var solidus = require('../solidus.js');
 describe( 'Solidus', function(){
 
 	beforeEach( function(){
-		solidus.start();
+		solidus.start({
+			log_level: 0
+		});
 	});
 
 	afterEach( function(){
@@ -11,7 +13,7 @@ describe( 'Solidus', function(){
 	});
 
 	it( 'Starts a new http server', function(){
-
+		
 	});
 
 	it( 'Creates routes based on the contents of /views', function(){
