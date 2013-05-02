@@ -21,7 +21,7 @@ describe( 'Solidus', function(){
 		process.chdir( __dirname );
 	});
 
-	it( 'Starts a new http server', function( done ){console.log( solidus.router.routes )
+	it( 'Starts a new http server', function( done ){
 		request( solidus.router )
 			.get('/')
 			.end( function( err, res ){
@@ -45,8 +45,34 @@ describe( 'Solidus', function(){
 		});
 	});
 
-	it( 'Creates redirects based on the contents of redirects.json', function(){
+	it( 'Serves assets in /assets', function( done ){
+		var s_request = request( solidus.router );
+		async.parallel([
+			function( callback ){
+				s_request.get('/scripts/test.js').expect( 200, callback );
+			},
+			function( callback ){
+				s_request.get('/styles/test.css').expect( 200, callback );
+			}
+		], function( err, results ){
+			if( err ) throw err;
+			done();
+		});
+	});
 
+	it( 'Creates redirects based on the contents of redirects.json', function( done ){
+		var s_request = request( solidus.router );
+		async.parallel([
+			function( callback ){
+				s_request.get('/redirect1').expect( 302, callback );
+			},
+			function( callback ){
+				s_request.get('/redirect2').expect( 302, callback );
+			}
+		], function( err, results ){
+			if( err ) throw err;
+			done();
+		});
 	});
 
 	it( 'Sets the default layout', function(){
