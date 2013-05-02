@@ -1,4 +1,3 @@
-var SITE_DIR = process.cwd();
 var API_MOCK_DIR = '/api';
 var DEFAULT_ENCODING = 'UTF8';
 var DEFAULT_PORT = 8080;
@@ -17,14 +16,15 @@ var request = require('request');
 var colors = require('colors');
 var Page = require('./lib/page.js');
 
-var views_path = path.join( SITE_DIR, 'views' );
-var redirects_path = path.join( SITE_DIR, 'redirects.json' );
-var preprocessors_path = path.join( SITE_DIR, 'preprocessors' );
+var site_path, views_path, redirects_path, preprocessors_path, assets_path;
 
-var solidus = {};
+var solidus = {
+	router: router,
+	server: server
+};
 
 // Start the solidus server
-solidus.start = function( options ){
+solidus.start = function( options, callback ){
 
 	var defaults = {
 		port: DEFAULT_PORT,
@@ -32,11 +32,17 @@ solidus.start = function( options ){
 	};
 	solidus.options = options = _( options || {} ).defaults( defaults );
 
+	site_path = process.cwd();
+	views_path = path.join( site_path, 'views' );
+	redirects_path = path.join( site_path, 'redirects.json' );
+	preprocessors_path = path.join( site_path, 'preprocessors' );
+	assets_path = path.join( site_path, 'assets' );
+
 	this.setupPages();
 	this.setupRedirects();
 	this.setupServer({
 		port: options.port
-	});
+	}, callback );
 
 };
 
@@ -167,7 +173,7 @@ solidus.clearRedirects = function(){
 };
 
 // Setup the express server
-solidus.setupServer = function( params ){
+solidus.setupServer = function( params, callback ){
 
 	params = params || {};
 
@@ -184,12 +190,12 @@ solidus.setupServer = function( params ){
 	router.engine( 'hbs', handlebars.engine );
 	router.set( 'view engine', 'hbs' );
 	router.set( 'views', views_path );
-	var assets_path = path.join( SITE_DIR, 'assets' );
 	router.use( express.static( assets_path ) );
 
-	server.listen( params.port );
-
-	if( solidus.options.log_level >= 1 ) console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
+	server.listen( params.port, function(){
+		if( callback ) callback();
+		if( solidus.options.log_level >= 1 ) console.log( '[SOLIDUS]'.cyan.bold +' Server running on port '+ params.port );
+	});
 
 };
 
