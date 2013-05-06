@@ -30,7 +30,7 @@ OR
 solidus [command] --[longflag] [value]
 ```
 
-Most of the time you'll be using `solidus dev` to start a Soidus server in development mode. To see a full list of commands/options available to you, just use the "help" flag ( `-h`, `--help` ).
+Most of the time you'll be using `solidus dev` to start a Solidus server in development mode. To see a full list of commands/options available to you, just use the "help" flag ( `-h`, `--help` ).
 
 ## Commands
 
