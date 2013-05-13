@@ -5,14 +5,12 @@
     "express": "3.1.x",
     "express3-handlebars": "0.4.x",
     "express-expose": "git://github.com/SparkartGroupInc/express-expose.git#escape-script-ending-tag",
-    "chokidar": "0.6.x",
     "request": "2.16.x",
     "underscore": "1.4.x",
     "async": "0.2.x",
     "commander": "1.1.x",
     "colors": "~0.6.x",
-    "fileset": "~0.1.5",
-    "gaze": "~0.3.4"
+    "fileset": "~0.1.5"
   },
   "devDependencies": {
     "grunt": "~0.4.0",
