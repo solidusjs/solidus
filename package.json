@@ -10,7 +10,9 @@
     "underscore": "1.4.x",
     "async": "0.2.x",
     "commander": "1.1.x",
-    "colors": "~0.6.x"
+    "colors": "~0.6.x",
+    "fileset": "~0.1.5",
+    "gaze": "~0.3.4"
   },
   "devDependencies": {
     "grunt": "~0.4.0",
@@ -21,7 +23,8 @@
     "grunt-contrib-handlebars": "~0.5.8",
     "grunt-contrib-watch": "~0.3.1",
     "mocha": "~1.9.0",
-    "supertest": "~0.6.0"
+    "supertest": "~0.6.0",
+    "chokidar": "~0.6.2"
   },
   "bin": {
     "solidus": "./bin/solidus"
