@@ -57,6 +57,21 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Creates routes with dynamic segments', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request.get('/dynamic/1').expect( 200, callback );
+				},
+				function( callback ){
+					s_request.get('/dynamic/2').expect( 200, callback );
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
+		});
+
 		it( 'Serves assets in /assets', function( done ){
 			var s_request = request( solidus_server.router );
 			async.parallel([
