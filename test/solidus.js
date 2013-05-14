@@ -6,6 +6,7 @@ var assert = require('assert');
 var async = require('async');
 var fs = require('fs');
 var request = require('supertest');
+var nock = require('nock');
 var solidus = require('../solidus.js');
 
 var original_path = __dirname;
@@ -24,6 +25,12 @@ describe( 'Solidus', function(){
 				log_level: 0,
 				port: 9009
 			});
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/abcdefg/my-resource')
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/zyxwvu/my-resource-2')
+				.reply( 200, { test: true });
 			// hack that will work until .start callback is complete
 			setTimeout( done, FILESYSTEM_DELAY );
 		});
@@ -94,6 +101,25 @@ describe( 'Solidus', function(){
 					s_request.get('/dynamic/2.json')
 						.expect( 'Content-Type', /json/ )
 						.expect( 200, callback );
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
+		});
+
+		it( 'Fetches resources and adds them to the page context', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request.get('/.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.resources.test.test === true );
+							assert( res.body.resources.test2.test === true );
+							callback( err );
+						});
 				}
 			], function( err, results ){
 				if( err ) throw err;
