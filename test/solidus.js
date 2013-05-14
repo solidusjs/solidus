@@ -72,6 +72,53 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Creates routes for page contexts', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request.get('/.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200, callback );
+				},
+				function( callback ){
+					s_request.get('/layout.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200, callback );
+				},
+				function( callback ){
+					s_request.get('/dynamic/1.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200, callback );
+				},
+				function( callback ){
+					s_request.get('/dynamic/2.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200, callback );
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
+		});
+
+		it( 'Preprocesses the context of pages', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request.get('/.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.test === true );
+							callback( err );
+						});
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
+		});
+
 		it( 'Serves assets in /assets', function( done ){
 			var s_request = request( solidus_server.router );
 			async.parallel([
