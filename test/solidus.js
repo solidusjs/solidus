@@ -145,6 +145,24 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Makes title attribute available in context', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request.get('/.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.page.title === "test" );
+							callback( err );
+						});
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
+		});
+
 		it( 'Serves assets in /assets', function( done ){
 			var s_request = request( solidus_server.router );
 			async.parallel([
