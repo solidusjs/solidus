@@ -85,22 +85,46 @@ describe( 'Solidus', function(){
 				function( callback ){
 					s_request.get('/.json')
 						.expect( 'Content-Type', /json/ )
-						.expect( 200, callback );
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.page );
+							assert( res.body.parameters );
+							assert( res.body.query );
+							callback( err );
+						});
 				},
 				function( callback ){
 					s_request.get('/layout.json')
 						.expect( 'Content-Type', /json/ )
-						.expect( 200, callback );
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.page );
+							assert( res.body.parameters );
+							assert( res.body.query );
+							callback( err );
+						});
 				},
 				function( callback ){
 					s_request.get('/dynamic/1.json')
 						.expect( 'Content-Type', /json/ )
-						.expect( 200, callback );
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.page );
+							assert( res.body.parameters );
+							assert( res.body.query );
+							callback( err );
+						});
 				},
 				function( callback ){
 					s_request.get('/dynamic/2.json')
 						.expect( 'Content-Type', /json/ )
-						.expect( 200, callback );
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.page );
+							assert( res.body.parameters );
+							assert( res.body.query );
+							callback( err );
+						});
 				}
 			], function( err, results ){
 				if( err ) throw err;
