@@ -1,12 +1,8 @@
-var DEFAULT_PORT = 8080;
-
-timesbound = 0;
+const DEFAULT_PORT = 8080;
 
 var solidus = {
 	Server: require('./lib/server.js')
 };
-
-var site_path, views_path, redirects_path, preprocessors_path, assets_path;
 
 // Start the solidus server
 solidus.start = function( options, callback ){
