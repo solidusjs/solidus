@@ -38,14 +38,9 @@ Most of the time you'll be using `solidus dev` to start a Solidus server in deve
 Starts a solidus server using the current folder. By default it runs on port 8080.
 
 ```
-solidus start -p 9001 --dev
-```
-
-### dev ( -p,--port )
-Starts a solidus server in development mode. Development mode automatically compiles assets, views, and preprocessors. This also runs a livereload server for automatically reloading CSS as its updated.
-
-```
-solidus dev --port 9001
+solidus start -p 9001
+solidus start --port 9001
+solidus start --dev
 ```
 
 ## Building a Solidus Site
@@ -89,25 +84,6 @@ Here's a quick example of what a page configuration might look like:
 		"preprocessor": "home.js"
 	}
 }}
-```
-
-All of a site's views can be accessed client-side as **JavaScript Templates**. Since views are just [Handlebars.js](http://handlebarsjs.com/) templates, all you need to do is include Handlebars, include your templates, and use them. Javascript templates, along with anything else solidus makes available client-side, is on the `solidus` namespace. Here's a quick example of how it works:
-
-`index.hbs`
-```html
-<html>
-	<head>
-		<script src="/scripts/vendor/handlebars.js"></script>
-		<script src="/compiled/templates.js"></script>
-		<script src="/compiled/partials.js"></script>
-		<script>
-			var markup = solidus.templates['kitties/index']( data );
-			$( function(){
-				$('body').append( markup );
-			});
-		</script>
-	</head>
-</html>
 ```
 
 -----
@@ -187,9 +163,17 @@ The context is automatically passed in as `data`, and any changes made to it wil
 
 -----
 
-### Assets
+### Assets and Grunt
 
-Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, or more. Just place your assets in the `assets` directory, and solidus will serve them up. While solidus does serve anything in the assets folder, there are a couple conventions that you should follow. First, all JavaScript files belong in the `scripts` directory, and all CSS in the `styles` directory. These directories have special significance, and their contents are used to produce the final compiled files when solidus sites are served live. Here's an example of the folder structure solidus assets:
+Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, or more. Just place your assets in the `assets` directory, and solidus will serve them up.
+
+When creating a Solidus site, you should always start off using the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template). This site template provides a set of [Grunt](http://gruntjs.com) instructions for asset compilation. These scripts will do the following:
+
+- Compile all js in `/scripts/` to `/compiled/scripts.js`
+- Compile all CSS/SASS in `/styles/` to `/compiled/styles.css`
+- Compile all views in `/views/` to `/compiled/templates.js` and `/compiled/partials.js`
+
+Here's a quick example of a Solidus site's asset structure:
 
 ```
 assets
@@ -205,7 +189,7 @@ assets
   |-kitties.sass
 ```
 
-After `solidus compile` or `solidus dev` are run, a new folder is created with the compiled scripts, styles, and templates of the site.
+After `grunt compile` or `grunt dev` are run, a new folder is created with the compiled scripts, styles, and templates of the site.
 
 ```
 assets
@@ -215,6 +199,25 @@ assets
   |-styles.css
   |-templates.js
 ...
+```
+
+All of a site's views can be accessed client-side as **JavaScript Templates**. Since views are just [Handlebars.js](http://handlebarsjs.com/) templates, all you need to do is include Handlebars, include your templates, and use them. Javascript templates, along with anything else solidus makes available client-side, is on the `solidus` namespace. Here's a quick example of how it works:
+
+`index.hbs`
+```html
+<html>
+	<head>
+		<script src="/scripts/vendor/handlebars.js"></script>
+		<script src="/compiled/templates.js"></script>
+		<script src="/compiled/partials.js"></script>
+		<script>
+			var markup = solidus.templates['kitties/index']( data );
+			$( function(){
+				$('body').append( markup );
+			});
+		</script>
+	</head>
+</html>
 ```
 
 At the moment, assets will be compiled in the order they appear in the filesystem. When building a site, you should always try to use the compiled assets, as they will be optimized for distribution. Other assets, such as fonts and images, have no compilation step and can be used as is.
