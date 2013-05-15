@@ -1,5 +1,3 @@
-const DEFAULT_PORT = 8080;
-
 var solidus = {
 	Server: require('./lib/server.js')
 };
