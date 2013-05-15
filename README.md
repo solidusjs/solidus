@@ -34,11 +34,11 @@ Most of the time you'll be using `solidus dev` to start a Solidus server in deve
 
 ## Commands
 
-### start ( -p,--port )
+### start ( -p,--port -d,--dev )
 Starts a solidus server using the current folder. By default it runs on port 8080.
 
 ```
-solidus start -p 9001
+solidus start -p 9001 --dev
 ```
 
 ### dev ( -p,--port )
@@ -218,3 +218,9 @@ assets
 ```
 
 At the moment, assets will be compiled in the order they appear in the filesystem. When building a site, you should always try to use the compiled assets, as they will be optimized for distribution. Other assets, such as fonts and images, have no compilation step and can be used as is.
+
+=======
+
+### Tests
+
+Solidus uses [mocha](https://github.com/visionmedia/mocha) to run its tests. Any new features should be tested, and resolved bugs should have tests to prevent regression. Tests can be run with the `mocha` command.
