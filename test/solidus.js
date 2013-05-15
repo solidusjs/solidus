@@ -87,20 +87,20 @@ describe( 'Solidus', function(){
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.page );
+							assert( res.body.page.title === 'test' );
 							assert( res.body.parameters );
 							assert( res.body.query );
 							callback( err );
 						});
 				},
 				function( callback ){
-					s_request.get('/layout.json')
+					s_request.get('/layout.json?test=true')
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.page );
 							assert( res.body.parameters );
-							assert( res.body.query );
+							assert( res.body.query.test );
 							callback( err );
 						});
 				},
@@ -110,7 +110,7 @@ describe( 'Solidus', function(){
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.page );
-							assert( res.body.parameters );
+							assert( res.body.parameters.segment == '1' );
 							assert( res.body.query );
 							callback( err );
 						});
@@ -121,7 +121,7 @@ describe( 'Solidus', function(){
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.page );
-							assert( res.body.parameters );
+							assert( res.body.parameters.segment == '2' );
 							assert( res.body.query );
 							callback( err );
 						});
@@ -160,24 +160,6 @@ describe( 'Solidus', function(){
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.test === true );
-							callback( err );
-						});
-				}
-			], function( err, results ){
-				if( err ) throw err;
-				done();
-			});
-		});
-
-		it( 'Makes title attribute available in context', function( done ){
-			var s_request = request( solidus_server.router );
-			async.parallel([
-				function( callback ){
-					s_request.get('/.json')
-						.expect( 'Content-Type', /json/ )
-						.expect( 200 )
-						.end( function( err, res ){
-							assert( res.body.page.title === "test" );
 							callback( err );
 						});
 				}
