@@ -32,7 +32,7 @@ describe( 'Solidus', function(){
 				.get('/api/v1/resources/zyxwvu/my-resource-2')
 				.reply( 200, { test: true });
 			// hack that will work until .start callback is complete
-			setTimeout( done, FILESYSTEM_DELAY );
+			solidus_server.on( 'ready', done );
 		});
 
 		afterEach( function(){
@@ -217,7 +217,9 @@ describe( 'Solidus', function(){
 				dev: true
 			});
 			// hack that will work until .start callback is complete
-			setTimeout( done, FILESYSTEM_DELAY );
+			solidus_server.on( 'ready', function(){
+				setTimeout( done, FILESYSTEM_DELAY );
+			});
 		});
 
 		afterEach( function(){
