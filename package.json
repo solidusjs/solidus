@@ -25,7 +25,11 @@
     "chokidar": "~0.6.2",
     "nock": "~0.18.0"
   },
+  "main": "solidus.js",
   "bin": {
     "solidus": "./bin/solidus"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }
