@@ -1,13 +1,6 @@
 #!/usr/bin/env node
 
-var grunt = require('grunt');
 var commander = require('commander');
-
-var doGruntTask = function(){
-	grunt.solidus_cwd = process.cwd();
-	process.chdir( __dirname );
-	grunt.cli();
-};
 
 commander.usage('[command] [option]');
 
@@ -22,17 +15,6 @@ commander
 			port: env.port,
 			dev: env.dev
 		});
-		//process.exit();
 	});
-
-commander
-	.command('dev')
-	.option('-p, --port [type]', 'port for the server to listen on [8080]', 8080 )
-	.description('Start Solidus in developer mode')
-	.action( doGruntTask );
-
-commander
-	.command('*')
-	.action( doGruntTask );
 
 commander.parse( process.argv );
