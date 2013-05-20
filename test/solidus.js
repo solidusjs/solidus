@@ -160,6 +160,10 @@ describe( 'Solidus', function(){
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.test === true );
+							assert( res.body.moment_test === '1995-12-25T00:00:00-08:00' );
+							assert( res.body.xdate_test === 'Mon Dec 25 1995 00:00:00 GMT-0800 (PST)' );
+							assert( res.body.underscore_test[0] === 'test' );
+							assert( res.body.sugar_test === 'test' )
 							callback( err );
 						});
 				}
@@ -290,6 +294,52 @@ describe( 'Solidus', function(){
 					if( err ) throw err;
 					done();
 				});
+			}, FILESYSTEM_DELAY );
+		});
+
+		var test_preprocessor_contents = 'context.test = true';
+
+		it( 'Adds preprocessors when a preprocessor js file is added', function( done ){
+			var s_request = request( solidus_server.router );
+			fs.writeFileSync( 'preprocessors/test.js', test_preprocessor_contents, DEFAULT_ENCODING );
+			setTimeout( function(){
+				s_request.get('/test.json')
+					.expect( 200 )
+					.end( function( err, res ){
+						if( err ) throw err;
+						assert( res.body.test );
+						done();
+					});
+			}, FILESYSTEM_DELAY );
+		});
+
+		var test_preprocessor_contents_2 = 'context.test2 = true';
+
+		it( 'Updates preprocessors when their files change', function( done ){
+			var s_request = request( solidus_server.router );
+			fs.writeFileSync( 'preprocessors/test.js', test_preprocessor_contents_2, DEFAULT_ENCODING );
+			setTimeout( function(){
+				s_request.get('/test.json')
+					.expect( 200 )
+					.end( function( err, res ){
+						if( err ) throw err;
+						assert( res.body.test2 );
+						done();
+					});
+			}, FILESYSTEM_DELAY );
+		});
+
+		it( 'Removes preprocessors when their file is removed', function( done ){
+			fs.unlinkSync('preprocessors/test.js');
+			var s_request = request( solidus_server.router );
+			setTimeout( function(){
+				s_request.get('/test.json')
+					.expect( 200 )
+					.end( function( err, res ){
+						if( err ) throw err;
+						assert( !res.body.test );
+						done();
+					});
 			}, FILESYSTEM_DELAY );
 		});
 
