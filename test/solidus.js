@@ -207,6 +207,33 @@ describe( 'Solidus', function(){
 			assert( solidus_server.handlebars.defaultLayout === 'layout' );
 		});
 
+		it( 'Uses the layout closest to a page view', function( done ){	
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request
+						.get('/deeply/nested/page/using/a_layout.json')
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.layout === 'deeply/nested/layout.hbs' );
+							callback( err );
+						});
+				},
+				function( callback ){
+					s_request
+						.get('/deeply/nested/page.json')
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.body.layout === 'deeply/nested/layout.hbs' );
+							callback( err );
+						});
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			})
+		});
+
 	});
 
 	describe( 'development', function(){
