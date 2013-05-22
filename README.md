@@ -30,7 +30,19 @@ OR
 solidus [command] --[longflag] [value]
 ```
 
-Most of the time you'll be using `solidus dev` to start a Solidus server in development mode. To see a full list of commands/options available to you, just use the "help" flag ( `-h`, `--help` ).
+Most of the time you'll be using `solidus start --dev` to start a Solidus server in development mode. To see a full list of commands/options available to you, just use the "help" flag ( `-h`, `--help` ).
+
+### API
+
+You can also run Solidus manually in code if you need to. In order to do this, just include Solidus locally and `require` it. The only method available at the moment is `solidus.start`, and it's essentially the same as the CLI command:
+
+```js
+var solidus = require('solidus');
+solidus.start({
+	port: 9001,
+	dev: true
+});
+```
 
 ## Commands
 
@@ -197,7 +209,7 @@ Here's an example `redirects.json`:
 
 ### Assets and Grunt
 
-Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, or more. Just place your assets in the `assets` directory, and solidus will serve them up.
+Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory, and solidus will serve them up.
 
 For more information on asset compilation and management, see the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template) documentation.
 
