@@ -153,7 +153,7 @@ Context in `/kitties`
 	"resources": {
 		"kitties": {
 			"count": 3,
-			"results": ['WESLEY','TWIZZER','PIXEL']
+			"results": ["WESLEY","TWIZZER","PIXEL"]
 		}
 	}
 }
