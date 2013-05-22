@@ -132,8 +132,8 @@ If the data returned in a resource isn't quite right for a template, a **preproc
 
 `preprocessors/kitties.js`
 ```javascript
-for( var i in data.resources.kitties.results ){
-	data.resources.kitties.results[i] = data.resources.kitties.results[i].toUpperCase();
+for( var i in context.resources.kitties.results ){
+	context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
 }
 ```
 
@@ -159,7 +159,7 @@ Context in `/kitties`
 }
 ```
 
-The context is automatically passed in as `data`, and any changes made to it will be reflected in the context used in the page.
+The context is automatically passed in as `context`, and any changes made to it will be reflected in the context used in the page.
 
 -----
 
