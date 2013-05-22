@@ -192,10 +192,16 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/redirect1').expect( 302, callback );
+					s_request.get('/redirect1').expect( 301, callback );
 				},
 				function( callback ){
 					s_request.get('/redirect2').expect( 302, callback );
+				},
+				function( callback ){
+					s_request.get('/redirect3').expect( 404, callback );
+				},
+				function( callback ){
+					s_request.get('/redirect4').expect( 404, callback );
 				}
 			], function( err, results ){
 				if( err ) throw err;
@@ -290,7 +296,7 @@ describe( 'Solidus', function(){
 			var redirects_json = JSON.stringify( redirects );
 			fs.writeFileSync( 'redirects.json', redirects_json, DEFAULT_ENCODING );
 			setTimeout( function(){
-				s_request.get('/redirect1').expect( 302, function( err ){
+				s_request.get('/redirect1').expect( 301, function( err ){
 					if( err ) throw err;
 					done();
 				});
@@ -306,7 +312,7 @@ describe( 'Solidus', function(){
 			var redirects_json = JSON.stringify( redirects );
 			fs.writeFileSync( 'redirects.json', redirects_json, DEFAULT_ENCODING );
 			setTimeout( function(){
-				s_request.get('/redirect2').expect( 302, function( err ){
+				s_request.get('/redirect2').expect( 301, function( err ){
 					if( err ) throw err;
 					done();
 				});
