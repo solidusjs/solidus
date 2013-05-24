@@ -19,7 +19,7 @@ Awesome things you can do with the [Solidus Site Template](https://github.com/Sp
 
 ## Installation
 
-To install Solidus (*this will change later!*):
+To install Solidus **(this will change later!)**:
 
 - Install [Node.js](http://nodejs.org)
 - Clone this repository. Ideally somewhere semi-permanent.
