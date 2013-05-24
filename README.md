@@ -72,7 +72,7 @@ solidus start --dev
 
 ## Building a Solidus Site
 
-Solidus sites are comprised of a **views**, **resources**, and **assets**. **Views** are [Handlebars](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, Hipster, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
+Solidus sites are comprised of **views**, **resources**, and **assets**. **Views** are [Handlebars](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
 
 -----
 
@@ -105,8 +105,8 @@ Here's a quick example of what a page configuration might look like:
 	{
 		"title": "Home",
 		"resources": {
-			"kitties": "https://hipster-tools.herokuapp.com/hipster/v1/resources/5632ac/tims-favorite-kitties",
-			"doggies": "https://hipster-tools.herokuapp.com/hipster/v1/resources/4657df/tims-favorite-doggies"
+			"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties",
+			"doggies": "https://example.com/api/v1/resources/4657df/tims-favorite-doggies"
 		},
 		"preprocessor": "home.js"
 	}
@@ -117,7 +117,9 @@ Here's a quick example of what a page configuration might look like:
 
 ### Resources
 
-Instead of keeping content in a database, solidus relies on external APIs for information. Solidus takes JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page. While API responses can be used directly, it is **highly recommended** that [Hipster](http://hipster-tools.sparkart.net) is used to proxy the requests first.
+Instead of keeping content in a database, solidus relies on external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
+
+**Important:** API responses are uncached, meaning API requests will be made for every pageview. This may cause any rate limits to be quickly exceeded in production when a site is exposed to traffic. An API proxy is therefore highly recommended.
 
 Here's a quick outline of how resources work:
 
@@ -127,7 +129,7 @@ Here's a quick outline of how resources work:
 ```html
 ...
 	"resources": {
-		"kitties": "https://hipster-tools.herokuapp.com/hipster/v1/resources/5632ac/tims-favorite-kitties"
+		"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
 	}
 ...
 ```
@@ -168,7 +170,7 @@ for( var i in context.resources.kitties.results ){
 ```html
 ...
 	"resources": {
-		"kitties": "https://hipster-tools.herokuapp.com/hipster/v1/resources/5632ac/tims-favorite-kitties"
+		"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
 	},
 	"preprocessor": "kitties.js"
 ...
