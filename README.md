@@ -103,7 +103,7 @@ Dynamic segments can also be specified with directory names:
 
 - **title** - The title of the page. This is generally used to populate the `<title>` tag.
 - **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
-- **preprocessor** - The path to the preprocessor to use for this page. Relative to
+- **preprocessor** - The path to the preprocessor to use for this page. Relative to the preprocessors directory.
 - **layout** - The path to the layout to use for this page. Overrides automatically defined local layouts.
 
 Here's a quick example of what a page configuration might look like:
@@ -124,9 +124,55 @@ Here's a quick example of what a page configuration might look like:
 
 -----
 
+### The Context
+
+Every page in a Solidus site has a **context**, which holds all of the data that's being fed to a view. The context contains things such as page metadata, data fetched from remote resources, query parameters, and dynamic segment values. Contexts can also be modified before they are used in the view by [preprocessors](#Preprocessors). Here's a quick run down of what you'll find in the page context:
+
+- **page** - General page metadata. Contains things like the current page's title and description (if defined).
+- **assets** - Contains automatically generated HTML tags for things like compiled JS/CSS and favicons.
+- **parameters** - Contains the names and values of any dynamic segments active in the current page.
+- **query** - Any data passed as a query parameter, like `?page=5`.
+- **resources** - The data returned by the page's resources.
+- **layout** - The current page's layout.
+
+Here's an example context:
+
+```json
+{
+	"page": {
+		"title": "Character Page",
+		"path": "/Users/Sparkart/solidus-test-site/views/characters/{hero_id}.hbs"
+	},
+	"parameters": {
+		"hero_id": "92352"
+	},
+	"query": {
+		"debug": "true"
+	},
+	"resources": {
+		"character": {
+			"id": 92352,
+			"name": "UUUGUUUUUUUU",
+			"class": "demon-hunter",
+			"gender": "0"
+			...
+		}
+	},
+	"assets": {
+		"scripts": "<script src=\"/compiled/scripts.js\"></script>",
+		"styles": "<link rel=\"stylesheet\" href=\"/compiled/styles.css\" />"
+	},
+	"layout": "layout.hbs"
+}
+```
+
+#### Preprocessors
+
+-----
+
 ### Resources
 
-Instead of keeping content in a database, solidus relies on external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
+Instead of keeping content in a database Solidus uses data from external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
 
 **Important:** API responses are uncached, meaning API requests will be made for every pageview. This may cause any rate limits to be quickly exceeded in production when a site is exposed to traffic. An API proxy is therefore highly recommended.
 
@@ -148,6 +194,7 @@ Here's a quick outline of how resources work:
 Context in `/kitties`
 ```json
 {
+	...
 	"resources": {
 		"kitties": {
 			"count": 3,
@@ -188,6 +235,7 @@ for( var i in context.resources.kitties.results ){
 Context in `/kitties`
 ```json
 {
+	...
 	"resources": {
 		"kitties": {
 			"count": 3,
