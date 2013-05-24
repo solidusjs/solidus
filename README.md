@@ -1,6 +1,21 @@
 # Solidus
 
-A simple server that generates sites from JSON and Templates.
+A simple [Node.js](http://nodejs.org/) server that generates sites from [Handlebars](http://handlebarsjs.com/) templates and JSON resources. Solidus helps you rapidly build sites by giving you a simple server you can run on both development machines and in production, along with customizable build scripts (via [Grunt](http://gruntjs.com)), and the ability to pull in content from any JSON API.
+
+Awesome things you can do with Solidus:
+
+- Generate site routes from view paths
+- Fetch remote JSON for content
+- Automatically use scoped layouts
+- Create dynamic routes quickly and easily
+- Easily deploy to services like [Appfog](https://www.appfog.com/), [Heroku](https://www.heroku.com/), [Nodejitsu](https://www.nodejitsu.com/), [AWS](http://aws.amazon.com/), etc.
+- Generate new sites from site templates (via grunt-init)
+
+Awesome things you can do with the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template):
+
+- Use your view templates client side (via Grunt)
+- [Livereload](http://livereload.com/) as you update your SASS/CSS (via Grunt)
+- Compile your styles/scripts into production bundles (via Grunt)
 
 ## Installation
 
@@ -10,7 +25,7 @@ To install Solidus (*this will change later!*):
 - Clone this repository. Ideally somewhere semi-permanent.
 - Navigate to the base folder of your clone and run `npm link` (you may need to use sudo: `sudo npm link`)
 
-It should be installed! Go ahead and try `solidus -h` to see if it worked.
+It should be installed! Go ahead and try `solidus -h` to see if it worked. You'll also want to make sure you have [Grunt](http://gruntjs.com) and [grunt-init](https://github.com/gruntjs/grunt-init) installed if you plan on using the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template).
 
 ## Usage
 
@@ -57,7 +72,7 @@ solidus start --dev
 
 ## Building a Solidus Site
 
-Solidus sites are comprised of a **views**, **resources**, and **assets**. **Views** are [Handlebars.js](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, Hipster, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
+Solidus sites are comprised of a **views**, **resources**, and **assets**. **Views** are [Handlebars](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, Hipster, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
 
 -----
 
