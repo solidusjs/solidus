@@ -166,10 +166,6 @@ Here's an example context:
 }
 ```
 
-#### Preprocessors
-
------
-
 ### Resources
 
 Instead of keeping content in a database Solidus uses data from external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
@@ -212,6 +208,8 @@ Context in `/kitties`
 	alert( 'Here are the kitties!', solidus.context.resources.kitties.results );
 </script>
 ```
+
+#### Preprocessors
 
 If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessors` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
