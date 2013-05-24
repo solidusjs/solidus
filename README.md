@@ -29,7 +29,7 @@ It should be installed! Go ahead and try `solidus -h` to see if it worked. You'l
 
 ## Usage
 
-Solidus is a command line interface (CLI), which means it's interface is entirely in the command line . Generally, you'll issue commands to solidus like so:
+Solidus has a command line interface (CLI), which means it's interface is entirely in the command line . Generally, you'll issue commands to solidus like so:
 
 ```
 solidus [command]
@@ -62,7 +62,10 @@ solidus.start({
 ## Commands
 
 ### start ( -p,--port -d,--dev )
-Starts a solidus server using the current folder. By default it runs on port 8080.
+Starts a solidus server using the current folder.
+
+- **port, p** specifies which port the Solidus server will listen on. By default it runs on port **8080**.
+- **dev, d** determines if the server runs in development mode or not. Development mode displays logging information and watches views/redirects/preprocessors for changes. This is set to **false** by default.
 
 ```
 solidus start -p 9001
@@ -77,7 +80,7 @@ Solidus sites are comprised of a **views**, **resources**, and **assets**. **Vie
 -----
 
 ### Views
-The `views` directory contains every *page*, *partial*, and *layout* in a site. Any view with the name `layout.hbs` will automatically become a *layout*. By default, *pages* will inherit the closest *layout* and use it, up to the root of the `views` directory. *Partials* and *pages* are identical and only differ in usage: you can use any view as a partial, and any view as a page.
+The `views` directory contains every *page*, *partial*, and *layout* in a site. Any view with the name `layout.hbs` will automatically become a *layout*. By default, *pages* will inherit the closest *layout* and use it, up to the root of the `views` directory. *Partials* and *pages* are identical and only differ in usage: you can use any view as a partial or a page.
 
 Every view in the `views` directory is available as a page. The routes of these pages are generated from their filename and location in the views directory. Here's a quick example:
 
@@ -91,11 +94,17 @@ Every view in the `views` directory is available as a page. The routes of these 
 - `views/doggies/{dog}.hbs` becomes `/doggies/ein`, `/doggies/marmaduke`, `/doggies/pixel`
 - `views/articles/{article_id}.hbs` becomes `/articles/582890`, `/articles/582811`, `/articles/600345`
 
+Dynamic segments can also be specified with directory names:
+
+- `views/doggies/{dog}/toys` becomes `/doggies/ein/toys`, `/doggies/marmaduke/toys`, `/doggies/pixel/toys`
+- `views/articles/{article_id}/links/{link_id}` becomes `/articles/582890/links/2`
+
 **Page configuration** is done with a JSON object nested within a Handlebars comment at the top of a page view. This object can contain the following:
 
 - **title** - The title of the page. This is generally used to populate the `<title>` tag.
 - **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
-- **preprocessor** - The path to the preprocessor to use for this page. Relative to 
+- **preprocessor** - The path to the preprocessor to use for this page. Relative to
+- **layout** - The path to the layout to use for this page. Overrides automatically defined local layouts.
 
 Here's a quick example of what a page configuration might look like:
 
