@@ -211,7 +211,7 @@ Context in `/kitties`
 
 #### Preprocessors
 
-If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessors` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
+If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
 `preprocessors/kitties.js`
 ```javascript
@@ -281,9 +281,9 @@ Here's an example `redirects.json`:
 
 ### Assets and Grunt
 
-Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory, and solidus will serve them up.
+Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory, and Solidus will serve them up.
 
-For more information on asset compilation and management, see the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template) documentation.
+Solidus uses Grunt to compile SASS, client side templates, and run other client-side tasks. An ideal `Gruntfile` is included with the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template), but any gruntfile or build system can be used. For more information on using Grunt for asset compilation and management in a Solidus site, see the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template) documentation.
 
 =======
 
