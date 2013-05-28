@@ -211,7 +211,7 @@ Context in `/kitties`
 
 #### Preprocessors
 
-If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
+If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. The context is automatically passed in as `context`, and any changes made to it will be reflected in the context used in the page. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
 `preprocessors/kitties.js`
 ```javascript
@@ -230,7 +230,20 @@ for( var i in context.resources.kitties.results ){
 ...
 ```
 
-Context in `/kitties`
+Original context in `/kitties`
+```json
+{
+	...
+	"resources": {
+		"kitties": {
+			"count": 3,
+			"results": ["Wesley","Twizzler","Pixel"]
+		}
+	}
+}
+```
+
+Processed context in `/kitties`
 ```json
 {
 	...
@@ -243,7 +256,28 @@ Context in `/kitties`
 }
 ```
 
-The context is automatically passed in as `context`, and any changes made to it will be reflected in the context used in the page.
+Preprocessors also come preloaded with some popular js libraries by default. [Underscore](http://underscorejs.org/), [Moment](http://momentjs.com/), [XDate](http://arshaw.com/xdate/), and [Sugar](http://sugarjs.com/) are all automatically accessible within preprocessor files. Here's a quick example:
+
+
+`preprocessors/kitties.js`
+```js
+context.resources.kitties.results = _( context.resources.kitties.results ).map( function( cat ){
+	return cat +' the cat';
+});
+```
+
+Processed context in `/kitties`
+```json
+{
+	...
+	"resources": {
+		"kitties": {
+			"count": 3,
+			"results": ["Wesley the cat","Twizzler the cat","Pixel the cat"]
+		}
+	}
+}
+```
 
 -----
 
