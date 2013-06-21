@@ -237,7 +237,34 @@ describe( 'Solidus', function(){
 			], function( err, results ){
 				if( err ) throw err;
 				done();
-			})
+			});
+		});
+
+		it( 'Makes partials available even if they have the same name in different directories', function( done ){
+			var s_request = request( solidus_server.router );
+			async.parallel([
+				function( callback ){
+					s_request
+						.get('/partial_holder/')
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.text == 'partial.hbs' );
+							callback( err );
+						});
+				},
+				function( callback ){
+					s_request
+						.get('/partial_holder2/')
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( res.text == 'deeply/partial.hbs' );
+							callback( err );
+						});
+				}
+			], function( err, results ){
+				if( err ) throw err;
+				done();
+			});
 		});
 
 	});
