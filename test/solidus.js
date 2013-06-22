@@ -403,6 +403,18 @@ describe( 'Solidus', function(){
 			}, FILESYSTEM_DELAY );
 		});
 
+		it( 'Passes a "dev" and "development" variables to view context', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/dev.json')
+				.expect( 200 )
+				.end( function( err, res ){
+					if( err ) throw err;
+					assert( res.body.dev );
+					assert( res.body.development );
+					done();
+				});
+		});
+
 	});
 
 });
