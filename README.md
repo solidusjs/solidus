@@ -19,11 +19,10 @@ Awesome things you can do with the [Solidus Site Template](https://github.com/Sp
 
 ## Installation
 
-To install Solidus **(this will change later!)**:
+To install Solidus:
 
 - Install [Node.js](http://nodejs.org)
-- Clone this repository. Ideally somewhere semi-permanent.
-- Navigate to the base folder of your clone and run `npm link` (you may need to use sudo: `sudo npm link`)
+- Run `npm install solidus -g`
 
 It should be installed! Go ahead and try `solidus -h` to see if it worked. You'll also want to make sure you have [Grunt](http://gruntjs.com) and [grunt-init](https://github.com/gruntjs/grunt-init) installed if you plan on using the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template).
 
