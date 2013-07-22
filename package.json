@@ -18,7 +18,7 @@
   "dependencies": {
     "express": "3.1.x",
     "express3-handlebars": "0.4.x",
-    "express-expose": "git://github.com/SparkartGroupInc/express-expose.git#escape-script-ending-tag",
+    "express-expose": "git+http://github.com/SparkartGroupInc/express-expose.git#escape-script-ending-tag",
     "request": "2.16.x",
     "underscore": "1.4.x",
     "async": "0.2.x",
