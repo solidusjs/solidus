@@ -31,6 +31,12 @@ describe( 'Solidus', function(){
 			nock('https://hipster.sparkart.net')
 				.get('/api/v1/resources/zyxwvu/my-resource-2')
 				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/qwerty/my-resource-3')
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/qwerty/my-resource-{resource_test}')
+				.reply( 200, { test: false });
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
 		});
@@ -136,12 +142,13 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/.json')
+					s_request.get('/.json?resource_test=3')
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.resources.test.test === true );
-							assert( res.body.resources.test2.test === true );
+							assert( res.body.resources.test.test );
+							assert( res.body.resources.test2.test );
+							assert( res.body.resources.test3.test );
 							callback( err );
 						});
 				}
