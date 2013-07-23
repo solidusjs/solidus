@@ -35,7 +35,7 @@ describe( 'Solidus', function(){
 				.get('/api/v1/resources/qwerty/my-resource-3')
 				.reply( 200, { test: true });
 			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/qwerty/my-resource-{resource_test}')
+				.get('/api/v1/resources/qwerty/my-resource-')
 				.reply( 200, { test: false });
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
