@@ -193,9 +193,10 @@ Context in `/kitties`
 	"resources": {
 		"kitties": {
 			"count": 3,
-			"results": ['Wesley','Twizzler','Pixel']
+			"results": ["Wesley", "Twizzler", "Pixel"]
 		}
 	}
+	...
 }
 ```
 
@@ -206,6 +207,34 @@ Context in `/kitties`
 <script>
 	alert( 'Here are the kitties!', solidus.context.resources.kitties.results );
 </script>
+```
+
+#### Dynamic Resources
+
+Sometimes resources will need to be requested with parameters that change dynamically. This can be done by using **dynamic segments** or **query parameters**. To create a dynamic resource, all you need to do is replace the dynamic part of your resource URL with a placeholder in curly braces (just like setting up dynamic routes). The name of the placeholder should match up with the name of the dynamic segment or query parameter you want to use to fill it in. In the event that a dynamic segment and query parameter have the same name, the query parameter will be used.
+
+`kitties/{resource_id}.hbs`
+```json
+...
+    "resources": {
+    	"kitties": "https://example.come/api/v1/resources/{resource_id}/kitties?order={order}"
+	}
+...
+```
+
+Context in `/kitties/635bc?order=alpha`
+(result from the resource: `https://example.come/api/v1/resources/635bc/kitties?order=alpha`)
+```json
+{
+	...
+	"resources": {
+		"kitties": {
+			"count": 3,
+			"results": ["Pixel", "Twizzler", "Wesley"]
+		}
+	}
+	...
+}
 ```
 
 #### Preprocessors
