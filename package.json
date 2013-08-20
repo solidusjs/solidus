@@ -19,7 +19,6 @@
     "express": "3.1.x",
     "express3-handlebars": "0.4.x",
     "express-expose": "git+http://github.com/SparkartGroupInc/express-expose.git#escape-script-ending-tag",
-    "request": "2.16.x",
     "underscore": "1.4.x",
     "async": "0.2.x",
     "commander": "1.1.x",
@@ -30,7 +29,9 @@
     "xdate": "~0.8.0",
     "moment": "~2.0.0",
     "chokidar": "~0.6.2",
-    "connect": "~2.8.4"
+    "connect": "~2.8.4",
+    "hyperquest": "~0.1.7",
+    "lru-cache": "~2.3.1"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
