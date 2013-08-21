@@ -169,7 +169,7 @@ Here's an example context:
 
 Instead of keeping content in a database Solidus uses data from external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
 
-**Important:** API responses are uncached, meaning API requests will be made for every pageview. This may cause any rate limits to be quickly exceeded in production when a site is exposed to traffic. An API proxy is therefore highly recommended.
+**Important:** API responses are cached, but expire in only a minute, meaning API requests very often. This may cause any rate limits to be quickly exceeded in production when a site is exposed to traffic. An API proxy is therefore highly recommended.
 
 Here's a quick outline of how resources work:
 
