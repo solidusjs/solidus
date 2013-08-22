@@ -14,3 +14,7 @@ solidus.start = function( options, callback ){
 };
 
 module.exports = solidus;
+
+process.on( 'uncaughtException', function( err ){
+	console.log( arguments );
+});
