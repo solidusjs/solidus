@@ -60,16 +60,18 @@ solidus.start({
 
 ## Commands
 
-### start ( -p,--port -d,--dev )
+### start
 Starts a solidus server using the current folder.
 
-- **port, p** specifies which port the Solidus server will listen on. By default it runs on port **8080**.
-- **dev, d** determines if the server runs in development mode or not. Development mode displays logging information and watches views/redirects/preprocessors for changes. This is set to **false** by default.
+- **--port, -p** specifies which port the Solidus server will listen on. By default it runs on port **8080**.
+- **--dev, -d** determines if the server runs in development mode or not. Development mode displays logging information and watches views/redirects/preprocessors for changes. This is set to **false** by default.
+- **--loglevel, -l** sets the level of logging the server should display. **0** - errors, **1** - warnings, **2** - status, **3** - debug
 
 ```
 solidus start -p 9001
 solidus start --port 9001
 solidus start --dev
+solidus start --loglevel 2
 ```
 
 ## Building a Solidus Site
