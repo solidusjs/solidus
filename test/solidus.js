@@ -274,6 +274,19 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Sends appropriate cache headers with pages', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request
+				.get('/')
+				.expect( 'cache-control', 'public, max-age='+ ( 60 * 5 ) )
+				.end( function( err, res ){
+					assert( new Date( res.headers['last-modified'] ) < new Date );
+					assert( new Date( res.headers['expires'] ) > new Date ); 
+					if( err ) throw err;
+					done();
+				});
+		});
+
 	});
 
 	describe( 'development', function(){
@@ -418,6 +431,17 @@ describe( 'Solidus', function(){
 					if( err ) throw err;
 					assert( res.body.dev );
 					assert( res.body.development );
+					done();
+				});
+		});
+
+		it( 'Does not send cache headers in development', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/')
+				.expect( 'cache-control', null )
+				.expect( 'last-modified', null )
+				.expect( 'expires', null )
+				.end( function( err, res ){
 					done();
 				});
 		});
