@@ -10,7 +10,7 @@ var nock = require('nock');
 var solidus = require('../solidus.js');
 
 var original_path = __dirname;
-var site1_path = path.join( original_path, 'fixtures', 'site1' );
+var site1_path = path.join( original_path, 'fixtures', 'site 1' );
 var site2_path = path.join( original_path, 'fixtures', 'site2' );
 
 describe( 'Solidus', function(){
