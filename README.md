@@ -313,7 +313,7 @@ Processed context in `/kitties`
 
 ### Redirects
 
-Redirects can easily be defined using the `redirects.json` file located in the base of the Solidus site's directory. This file simply contains an array of redirection objects with the parameters `from`, `to`, `start`, and `end`. `From` is the route you want to redirect from, and `to` is the target destination. `Start` and `end` are datetimes that correspond with when the redirection should be active and are in `YYYY-MM-DD HH:MM:SS` format. Redirects with a `start` or `end` attribute will be **302 Found** while redirects without will be **301 Moved Permanently**.
+Redirects can easily be defined using the `redirects.json` file located in the base of the Solidus site's directory. This file simply contains an array of redirection objects with the parameters `from`, `to`, `start`, `end`, and `permanent`. `from` is the route you want to redirect from, and `to` is the target destination. `Start` and `end` are datetimes that correspond with when the redirection should be active and are in `YYYY-MM-DD HH:MM:SS` format. By default all redirects will be **302 Found**, but if `permanent` is true they will be served as **301 Moved Permanently**.
 
 Here's an example `redirects.json`:
 
@@ -327,17 +327,17 @@ Here's an example `redirects.json`:
 	"start": "2000-1-1 00:00:00"
 }, {
 	"from": "/redirect3",
-	"to": "http://www.sparkart.com",
-	"start": "3000-1-1 00:00:00"
+	"to": "/",
+	"start": "2000-1-1 00:00:00",
+	"end": "2014-1-1 00:00:00"
 }, {
 	"from": "/redirect4",
-	"to": "http://www.spakart.com",
+	"to": "/",
 	"end": "2000-1-1 00:00:00"
 }, {
 	"from": "/redirect5",
-	"to": "http://www.spakart.com",
-	"start": "2000-1-1 00:00:00",
-	"end": "2020-1-1 00:00:00"
+	"to": "/",
+	"permanent": true
 }]
 ```
 
