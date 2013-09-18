@@ -282,13 +282,16 @@ Now any resource that starts with `http://proxy.storyteller.io/` will mix in the
 
 #### Preprocessors
 
-If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in the `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. The context is automatically passed in as `context`, and any changes made to it will be reflected in the context used in the page. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
+If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in a site's `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. Preprocessors are simply [CommonJS modules](http://dailyjs.com/2010/10/18/modules/) that export a function which modifies and returns the page's `context`. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
 `preprocessors/kitties.js`
 ```javascript
-for( var i in context.resources.kitties.results ){
-	context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
-}
+module.exports = function( context ){
+	for( var i in context.resources.kitties.results ){
+		context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
+	}
+	return context;
+};
 ```
 
 `views/kitties/index.hbs`
@@ -327,14 +330,18 @@ Processed context in `/kitties`
 }
 ```
 
-Preprocessors also come preloaded with some popular js libraries by default. [Underscore](http://underscorejs.org/), [Moment](http://momentjs.com/), [XDate](http://arshaw.com/xdate/), and [Sugar](http://sugarjs.com/) are all automatically accessible within preprocessor files. Here's a quick example:
+By default, the following libraries are available for use in preprocessors by using the `require` method: [Underscore](http://underscorejs.org/), [Moment](http://momentjs.com/), [XDate](http://arshaw.com/xdate/), and [Sugar](http://sugarjs.com/). Additional node.js libraries can be added by adding them to your site's `package.json`, installing them, and `require`ing them in your preprocessor. Here's a quick example:
 
 
 `preprocessors/kitties.js`
 ```js
-context.resources.kitties.results = _( context.resources.kitties.results ).map( function( cat ){
-	return cat +' the cat';
-});
+var _ = require('underscore');
+module.exports = function( context ){
+	context.resources.kitties.results = _( context.resources.kitties.results ).map( function( cat ){
+		return cat +' the cat';
+	});
+	return context;
+};
 ```
 
 Processed context in `/kitties`
