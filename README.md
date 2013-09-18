@@ -1,5 +1,7 @@
 # Solidus
 
+## Major changes have been made to the way preprocessors work! [Read the new preprocessor documentation](#preprocessors)
+
 A simple [Node.js](http://nodejs.org/) server that generates sites from [Handlebars](http://handlebarsjs.com/) templates and JSON resources. Solidus helps you rapidly build sites by giving you a simple server you can run on both development machines and in production, along with customizable build scripts (via [Grunt](http://gruntjs.com)), and the ability to pull in content from any JSON API.
 
 Awesome things you can do with Solidus:
