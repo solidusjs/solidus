@@ -8,7 +8,7 @@ commander
 	.command('start')
 	.option( '-p, --port [type]', 'port for server to listen on [8080]', 8080 )
 	.option( '-d, --dev', 'run in developer mode' )
-	.option( '-l, --loglevel [loglevel]', 'run at a specific log level [0]', 0 )
+	.option( '-l, --loglevel [loglevel]', 'run at a specific log level [2]', 2 )
 	.description('Start Solidus')
 	.action( function( env ){
 		var solidus = require('../solidus.js');
