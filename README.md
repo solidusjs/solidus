@@ -337,9 +337,7 @@ By default, the following libraries are available for use in preprocessors by us
 ```js
 var _ = require('underscore');
 module.exports = function( context ){
-	context.resources.kitties.results = _( context.resources.kitties.results ).map( function( cat ){
-		return cat +' the cat';
-	});
+	context.resources.kitties.results = _.shuffle( context.resources.kitties.results );
 	return context;
 };
 ```
@@ -351,7 +349,7 @@ Processed context in `/kitties`
 	"resources": {
 		"kitties": {
 			"count": 3,
-			"results": ["Wesley the cat","Twizzler the cat","Pixel the cat"]
+			"results": ["Pixel","Twizzler","Wesley"]
 		}
 	}
 }
