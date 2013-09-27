@@ -21,7 +21,7 @@ Node server written in JavaScript that is comprised of multiple modules installe
 
 ## What’s npm?
 
-npm is a package manager for Node. It's accessed via a CLI (command line interface) and will automatically install any modules defined in package.json. By default, Grunt and several Grunt p
+npm is a package manager for Node. It's accessed via a CLI (command line interface) and will automatically install any modules defined in the package.json file. By default, Grunt and several Grunt plug-ins are included in a Solidus site.
 
 
 Installing Solidus CLI
