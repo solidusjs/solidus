@@ -1,8 +1,14 @@
+# Resources
+
 http://storyteller.io
 
 ## What is a resource?
 
-## How do I create/find a resource?
+## How do I create a resource?
+
+## How do I see the data the resource returns?
+
+## How do I use the returned data in my templates?
 
 
 Requesting JSON
