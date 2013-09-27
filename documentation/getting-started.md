@@ -14,17 +14,14 @@ Installing node.js and npm
 
 ## What's Node.js?
 
-- A server that is comprised of multiple modules installed by npm.
-- Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
+Node server written in JavaScript that is comprised of multiple modules installed by npm.Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
 
 **[Download an Installer](http://nodejs.org/download)**
 
 
 ## What’s npm?
 
-- Package manager
-- Installs modules that are outlined in package.json when `npm install` is run in the same directory as package.json
-
+npm is a package manager for Node. It's accessed via a CLI (command line interface) and will automatically install any modules defined in package.json. By default, Grunt and several Grunt p
 
 
 Installing Solidus CLI
@@ -60,9 +57,37 @@ Installing Grunt
 
 ## What's Grunt?
 
-- Preferred in Node.js environments to handle tasks that run shell commands and code (like what?)
-- Our setup processes assets (compiles Sass) by default
-- Gruntfile available to developers so it can be modified to fulfill any task (CoffeeScript, LESS, Stylus)
+[Grunt](http://gruntjs.com/) is a task runner that plays well with Node.js. It runs repetitive tasks so you don't have to. Each task comes in the form of a stand-alone plug-in, which makes Grunt easily extensible.
+
+For a default Solidus site, Grunt runs the following tasks:
+
+1. Compiles Sass to CSS
+1. Concatenates CSS
+1. Minifies the CSS
+1. Cleans the CSS
+1. Compiles [Handlebars templates](/pages)
+1. Concatenates the Handlebars templates
+1. Sets up [Require.js]()
+1. Minifies JavaScript
+1. Sets up [LiveReload]()
+1. Starts Solidus
+
+
+## Installing Grunt
+
+Grunt has already been installed via npm. What we're installing is the Grunt CLI. The Grunt CLI adds a command that runs the version of Grunt that's installed next to a Gruntfile.
+
+ `npm install -g grunt-cli`
+
+
+### Gruntfile
+
+This file contains the configuration for Grunt, defines the tasks you want it to run, and loads Grunt plugins. Solidus adds some default configuration, but you can add any Grunt plugin you want to help your workflow.
+
+
+## Installing new Grunt Plug-ins
+
+[Grunt Plugins](http://gruntjs.com/plugins)
 
 
 
@@ -71,8 +96,13 @@ Installing Sass
 
 ## What's Sass?
 
+Notes:
 - A quicker way to write CSS
 - Access to variables, nesting, mixins
+- Completely optional, dev can use straight CSS, or LESS or Stylus with a Grunt plug-in.
+- Install Ruby Gem for OS X
+- Install Ruby for Windows (http://rubyinstaller.org/downloads/)
+
 
 
 **New / Existing Site Tabs**
@@ -82,31 +112,29 @@ Setup a New Website
 
 Now you're ready to start a project. Solidus CLI makes this easy. To start, just navigate to wherever you keep all of your other projects, and run this command:
 
-    solidus setup site-domain.com
+```
+solidus setup site-domain.com
+```
 
 This command will create the following folders and files inside a new folder named for the domain:
 
  - **/assets**
-
  - **/node_modules** — this contains the Solidus server and all of the other modules that it depends upon.
-
  - **/resources**
-
  - **/views**
-
  - **gruntfile.json**
-
  - **package.json**
-
  - **server.js** - this file tells services like Modulus and Nodejitsu how to start the Solidus server.
 
 
 Working with an Existing Website
 -------------------------------------------------------------------------------------------
 
- - Pull down from Git
- - Run `npm install` to install required modules
- - Do you have Solidus installed already?
+Notes:
+ - Pull down site from Git
+ - Run `npm install` to install required modules defined in package.json
+ - Run `grunt dev` to activate Grunt which start Solidus
+
 
 
 ## Solidus ♥ Git
@@ -124,4 +152,6 @@ Be sure to keep your website repos clear of files that you didn't create. A glob
 Start a Dev Server
 -------------------------------------------------------------------------------------------
 
-    solidus dev
+```
+solidus dev
+```
