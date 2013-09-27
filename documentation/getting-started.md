@@ -9,8 +9,19 @@ The heart of Solidus is a node.js server used to fetch JSON and serve pages. It 
 [node.js](http://nodejs.org) is naturally the best way to work with JSON data on a server — everything is just JavaScript. This also makes it easy to share code and data with the browser. When the server and browser can work together in harmony, a superfast, seamless experience for visitors is the result. On top of this, the incredibly talented node community is hard at work on new ways to solve common challenges such as [working with assets](http://gruntjs.org) and [superfast page serving](http://expressjs.org).
 
 
+What are the steps to working on a Solidus site?
+-------------------------------------------------------------------------------------------
+
+    1. [Install Node](#node)
+    1. [Install Solidus](#solidus) via npm
+    1. [Install Grunt](#grunt) via npm
+    1. [Install Sass](#sass)
+    1. [Setup a new site](#setup) via Solidus CLI (or [initialize an existing site](#existing))
+    1. Profit.
+
+
 Installing node.js and npm
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 
 ## What's Node.js?
 
@@ -45,8 +56,6 @@ It should be installed! Go ahead and try `solidus --help` to see if it worked. I
 ```
 sudo npm install solidus --global
 ```
-
-
 
 
 ## Common Issues (from GitHub API)
