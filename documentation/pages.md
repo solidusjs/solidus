@@ -6,7 +6,6 @@
 
 ### Why Handlebars?
 
-
 Templating
 -------------------------------------------------------------------------------------------
 
@@ -20,9 +19,37 @@ Templating
     └── layout.hbs
 
 ### Templates
+
+#### Template Configuration
+
+Pages are configured with a JSON object nested within a Handlebars comment at the top of each page view. The configuration object can contain the following:
+
+* **title** - The title of the page. This is generally used to populate the `<title>` tag.
+* **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
+* **preprocessor** - The path to the preprocessor to use for this page. Relative to the preprocessors directory.
+* **layout** - The path to the layout to use for this page. Overrides automatically defined local layouts.
+Here's a quick example of what a page configuration might look like:
+
+`index.hbs`
+
+` {{!
+    {
+        "title": "Home",
+        "resources": {
+            "kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties",
+            "doggies": "https://example.com/api/v1/resources/4657df/tims-favorite-doggies"
+        },
+        "preprocessor": "home.js"
+    }
+}} `
+
 ### Layouts
+
+    - Scoped Layouts
+
 ### Partials
 
+    - Snippets of code
     - Used to keep your code DRY
     - Can be Included via Handlebars
 
