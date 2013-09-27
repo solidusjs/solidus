@@ -29,6 +29,7 @@ Installing Solidus CLI
 
 ## What is a CLI
 
+Notes:
 - Command Line Interface
 - Type commands into your Terminal or Command Prompt
 
@@ -44,6 +45,8 @@ It should be installed! Go ahead and try `solidus --help` to see if it worked. I
 ```
 sudo npm install solidus --global
 ```
+
+
 
 
 ## Common Issues (from GitHub API)
@@ -137,7 +140,8 @@ Notes:
 
 
 
-## Solidus ♥ Git
+Solidus ♥ Git
+-------------------------------------------------------------------------------------------
 
 Whether working alone or as part of a team, we recommend creating a Git repository for every website. Together with GitHub you won’t find a better way to track and share changes or protect yourself from horrible mistakes!
 
@@ -149,9 +153,20 @@ Be sure to keep your website repos clear of files that you didn't create. A glob
 - `/assets/compiled/`
 
 
+## What is Git?
+
+## How do I use Git?
+
+
 Start a Dev Server
 -------------------------------------------------------------------------------------------
 
+Notes:
+- Grunt task `grunt dev` runs three tasks
+    1. Compile - Assets preprocessed and concatenated
+    1. Server - runs `solidus server` to start dev server
+    1. Watch - Watches for changes in the filesystem and re-runs tasks if changes detected.
+
 ```
-solidus dev
+grunt dev
 ```
