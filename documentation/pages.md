@@ -9,9 +9,9 @@
 Handlebars
 -------------------------------------------------------------------------------------------
 
-### What is Handlebars?
+## What is Handlebars?
 
-### Why Handlebars?
+## Why Handlebars?
 
 
 Context
@@ -34,9 +34,9 @@ Templating
     ├── index.hbs
     └── layout.hbs
 
-### Templates
+## Templates
 
-#### Template Configuration
+### Template Configuration
 
 Pages are configured with a JSON object nested within a Handlebars comment at the top of each page view. The configuration object can contain the following:
 

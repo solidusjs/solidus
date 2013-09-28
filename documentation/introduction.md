@@ -22,6 +22,5 @@ Solidus provides a straightforward workflow to:
 1. [Assets](#)
 1. [Going Live](#)
 
-
 ## About
 Made by [Sparkart](http://www.sparkart.com/) in Oakland, CA.
