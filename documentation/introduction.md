@@ -18,7 +18,7 @@ Solidus provides a straightforward workflow to:
 
 1. [Getting Started](#)
 1. [Pages](#)
-1. [Resources?](#)
+1. [Resources](#)
 1. [Assets](#)
 1. [Going Live](#)
 

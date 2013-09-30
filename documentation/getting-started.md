@@ -9,28 +9,28 @@ The heart of Solidus is a node.js server used to fetch JSON and serve pages. It 
 [node.js](http://nodejs.org) is naturally the best way to work with JSON data on a server — everything is just JavaScript. This also makes it easy to share code and data with the browser. When the server and browser can work together in harmony, a superfast, seamless experience for visitors is the result. On top of this, the incredibly talented node community is hard at work on new ways to solve common challenges such as [working with assets](http://gruntjs.org) and [superfast page serving](http://expressjs.org).
 
 
-What are the steps to working on a Solidus site?
+What are the steps for setting up a Solidus site?
 -------------------------------------------------------------------------------------------
 
-    1. [Install Node](#node)
-    1. [Install Solidus](#solidus) via npm
-    1. [Install Grunt](#grunt) via npm
-    1. [Install Sass](#sass)
-    1. [Setup a new site](#setup) via Solidus CLI (or [initialize an existing site](#existing))
-    1. Profit.
+1. [Install Node and npm](#node)
+1. [Install Solidus](#solidus) via npm
+1. [Install Grunt](#grunt) via npm
+1. [Install Sass](#sass)
+1. [Setup a new site](#setup) via Solidus CLI (or [work an existing site](#existing))
+1. Profit.
 
 
 Installing node.js and npm
 -------------------------------------------------------------------------------------------
 
-## What's Node.js?
+### What's Node.js?
 
-Node server written in JavaScript that is comprised of multiple modules installed by npm.Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
+Node server written in JavaScript that is comprised of multiple modules installed by npm. Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
 
 **[Download an Installer](http://nodejs.org/download)**
 
 
-## What’s npm?
+### What’s npm?
 
 npm is a package manager for Node. It's accessed via a CLI (command line interface) and will automatically install any modules defined in the package.json file. By default, Grunt and several Grunt plug-ins are included in a Solidus site.
 
@@ -38,14 +38,14 @@ npm is a package manager for Node. It's accessed via a CLI (command line interfa
 Installing Solidus CLI
 -------------------------------------------------------------------------------------------
 
-## What is a CLI
+### What is a CLI
 
 Notes:
 - Command Line Interface
 - Type commands into your Terminal or Command Prompt
 
 
-## Windows/Mac tabs (switch OS-styled frame)
+### Windows/Mac tabs (switch OS-styled frame)
 
 ```
 npm install solidus --global
@@ -58,7 +58,7 @@ sudo npm install solidus --global
 ```
 
 
-## Common Issues (from GitHub API)
+### Common Issues (from GitHub API)
 
 **[Report an Issue](http://github.com/sparkartgroupinc/solidus/issues/new)**
 
@@ -67,7 +67,7 @@ sudo npm install solidus --global
 Installing Grunt
 -------------------------------------------------------------------------------------------
 
-## What's Grunt?
+### What's Grunt?
 
 [Grunt](http://gruntjs.com/) is a task runner that plays well with Node.js. It runs repetitive tasks so you don't have to. Each task comes in the form of a stand-alone plug-in, which makes Grunt easily extensible.
 
@@ -85,19 +85,19 @@ For a default Solidus site, Grunt runs the following tasks:
 1. Starts Solidus
 
 
-## Installing Grunt
+### Installing Grunt
 
 Grunt has already been installed via npm. What we're installing is the Grunt CLI. The Grunt CLI adds a command that runs the version of Grunt that's installed next to a Gruntfile.
 
  `npm install -g grunt-cli`
 
 
-### Gruntfile
+#### Gruntfile
 
 This file contains the configuration for Grunt, defines the tasks you want it to run, and loads Grunt plugins. Solidus adds some default configuration, but you can add any Grunt plugin you want to help your workflow.
 
 
-## Installing new Grunt Plug-ins
+### Installing new Grunt Plug-ins
 
 [Grunt Plugins](http://gruntjs.com/plugins)
 
@@ -106,7 +106,7 @@ This file contains the configuration for Grunt, defines the tasks you want it to
 Installing Sass
 -------------------------------------------------------------------------------------------
 
-## What's Sass?
+### What's Sass?
 
 Notes:
 - A quicker way to write CSS

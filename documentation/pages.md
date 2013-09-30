@@ -9,17 +9,17 @@
 Handlebars
 -------------------------------------------------------------------------------------------
 
-## What is Handlebars?
+### What is Handlebars?
 
-## Why Handlebars?
+### Why Handlebars?
 
 
 Context
 -------------------------------------------------------------------------------------------
 
-## What is the context?
+### What is the context?
 
-## How do I see the context?
+### How do I see the context?
 
 
 Templating
@@ -34,9 +34,9 @@ Templating
     ├── index.hbs
     └── layout.hbs
 
-## Templates
+### Templates
 
-### Template Configuration
+#### Template Configuration
 
 Pages are configured with a JSON object nested within a Handlebars comment at the top of each page view. The configuration object can contain the following:
 
@@ -60,14 +60,14 @@ Here's a quick example of what a page configuration might look like:
 }} `
 
 
-## Layouts
+### Layouts
 
 Notes:
 
     - Scoped Layouts
 
 
-## Partials
+### Partials
 
 Notes:
 
@@ -79,7 +79,7 @@ Notes:
 URLs
 --------------------------------------------------------------------------------
 
-## Old-school Filesystem Routing
+### Old-school Filesystem Routing
 
 The routes of all page views are generated from their filename and location within the views directory.
 
@@ -89,7 +89,7 @@ The routes of all page views are generated from their filename and location with
 * `views/kitties/mr-welsey-kins.hbs` becomes `/kitties/mr-wesley-kins`
 
 
-## Dynamic Segments
+### Dynamic Segments
 
 Dynamic segments can be defined by using curly braces `{}` in the view's filename. A dynamic segment is a placeholder for something variable, like a page number or ID. Here are some examples of views with dynamic segments:
 
@@ -102,7 +102,7 @@ Dynamic segments can also be specified with directory names:
 * `views/articles/{article_id}/links/{link_id}` becomes `/articles/582890/links/2`
 
 
-### Dynamic Segments + Resources
+#### Dynamic Segments + Resources
 
 
 Dynamic Rendering
