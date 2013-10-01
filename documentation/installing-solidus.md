@@ -1,10 +1,10 @@
 # Installing Solidus
 
-## Overview
+### Overview
 
 The heart of Solidus is a node.js server used to fetch JSON and serve pages. It can be easily run on a Mac or PC for development. It’s also [easily deployed](#) for production and has been [battle tested](http://sparkart.com) running sites serving millions of monthly pageviews.
 
-## Why node?
+### Why node?
 
 [node.js](http://nodejs.org) is naturally the best way to work with JSON data on a server — everything is just JavaScript. This also makes it easy to share code and data with the browser. When the server and browser can work together in harmony, a superfast, seamless experience for visitors is the result. On top of this, the incredibly talented node community is hard at work on new ways to solve common challenges such as [working with assets](http://gruntjs.org) and [superfast page serving](http://expressjs.org).
 
@@ -12,27 +12,25 @@ The heart of Solidus is a node.js server used to fetch JSON and serve pages. It 
 Installing node.js and npm
 -------------------------------------------------------------------------------------------
 
-## What's Node.js?
+### What's Node.js?
 
 Node server written in JavaScript that is comprised of multiple modules installed by npm.Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
 
 **[Download an Installer](http://nodejs.org/download)**
 
 
-## What’s npm?
+### What’s npm?
 
 npm is a package manager for Node. It's accessed via a CLI (command line interface) and will automatically install any modules defined in the package.json file. By default, Grunt and several Grunt plug-ins are included in a Solidus site.
 
+### Further Reading
+* [Node.js](http://nodejs.org/)
+* [npm](https://npmjs.org/)
+
+
 
 Installing Solidus CLI
--------------------------------------------------------------------------------------------
-
-### What is a CLI
-
-Notes:
-- Command Line Interface
-- Type commands into your Terminal or Command Prompt
-
+-------------------------------------------------------------------------------------------=
 
 ### Windows/Mac tabs (switch OS-styled frame)
 
@@ -68,9 +66,9 @@ For a default Solidus site, Grunt runs the following tasks:
 1. Cleans the CSS
 1. Compiles [Handlebars templates](/pages)
 1. Concatenates the Handlebars templates
-1. Sets up [Require.js]()
+1. Sets up [Require.js](http://requirejs.org/)
 1. Minifies JavaScript
-1. Sets up [LiveReload]()
+1. Sets up [LiveReload](https://npmjs.org/package/livereload)
 1. Starts Solidus
 
 
@@ -87,9 +85,11 @@ This file contains the configuration for Grunt, defines the tasks you want it to
 
 
 ### Installing new Grunt Plug-ins
+* [Grunt Plugins](http://gruntjs.com/plugins)
 
-[Grunt Plugins](http://gruntjs.com/plugins)
 
+### Further Reading
+* [Grunt.js](http://gruntjs.com/)
 
 
 Installing Sass
@@ -151,9 +151,9 @@ Be sure to keep your website repos clear of files that you didn't create. A glob
 - `/assets/compiled/`
 
 
-## What is Git?
-
-## How do I use Git?
+### Further Reading
+* [Github](https://github.com/)
+* [Learn Git in 15 minutes](http://try.github.io/levels/1/challenges/1)
 
 
 Start a Dev Server
