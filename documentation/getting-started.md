@@ -12,11 +12,11 @@ The heart of Solidus is a node.js server used to fetch JSON and serve pages. It 
 Steps for setting up a Solidus site
 -------------------------------------------------------------------------------------------
 
-1. [Install Node and npm](#node)
-1. [Install Solidus](#solidus) via npm
-1. [Install Grunt](#grunt) via npm
-1. [Install Sass](#sass) via Ruby
-1. [Setup a new site](#setup) via Solidus (or [work an existing site](#existing) via Git)
+1. [Install Node and npm](#toc-installing-nodejs-and-npm)
+1. [Install Solidus](#toc-installing-solidus) via npm
+1. [Install Grunt](#toc-installing-grunt-cli) via npm
+1. [Install Sass](#toc-installing-sass) via Ruby
+1. [Setup a new site](#toc-setup-a-new-website) via Solidus (or [work on an existing site](#toc-working-with-an-existing-website) via Git)
 1. Profit.
 
 
@@ -75,7 +75,7 @@ The Grunt CLI adds a command that runs the version of Grunt that's installed nex
 npm install -g grunt-cli
 ```
 
-### Further Reading
+### Learn More
 * [How does Solidus use Grunt](/installing-solidus#grunt)
 * [What's a Gruntfile](#)
 
@@ -97,7 +97,7 @@ Once you have Ruby installed, you can install Sass with the following command:
 gem install sass
 ```
 
-### Further Reading
+### Learn More
 * [Official Sass Tutorial](http://sass-lang.com/tutorial.html)
 * [Learn Sass at Codeschool](http://www.codeschool.com/courses/assembling-sass)
 * [Sass Blog](http://thesassway.com/)
@@ -126,7 +126,7 @@ This command will create the following folders and files inside a new folder usi
  - **server.js** - this file tells services like Modulus and Nodejitsu how to start the Solidus server.
 
 
-Working with an Existing Website
+Working on an Existing Website
 -------------------------------------------------------------------------------------------
 
 If you're going to be working with a site that's already been created and is (hopefully) on Github, getting the site up and running locally is easy.
@@ -149,7 +149,7 @@ Be sure to keep your website repos clear of files that you didn't create. A glob
 - `npm-debug.log`
 - `/assets/compiled/`
 
-### Further Reading
+### Learn More
 * [Learn Git in 15 minutes](http://try.github.io/levels/1/challenges/1)
 
 
@@ -164,8 +164,8 @@ grunt dev
 
 Visit `localhost:8080` in your browser to access your Solidus site.
 
-### Further Reading
-[Details of Starting Solidus](/installing-solidus#start)
+### Learn More
+[Details of Starting Solidus](/solidus/installing-solidus)
 
 
 Further Reading
