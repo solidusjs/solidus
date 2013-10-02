@@ -16,11 +16,11 @@ Solidus provides a straightforward workflow to:
 
 ## Learn More
 
-1. [Getting Started](#)
-1. [Pages](#)
-1. [Resources](#)
-1. [Assets](#)
-1. [Going Live](#)
+1. [Getting Started](/solidus/getting-started)
+1. [Pages](/solidus/pages)
+1. [Resources](/solidus/resources)
+1. [Assets](/solidus/assets)
+1. [Going Live](/solidus/going-live)
 
 ## About
 Made by [Sparkart](http://www.sparkart.com/) in Oakland, CA.

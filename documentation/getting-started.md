@@ -171,5 +171,5 @@ Visit `localhost:8080` in your browser to access your Solidus site.
 Further Reading
 -------------------------------------------------------------------------------------------
 
-* The [Installing Solidus](/installing-solidus) guide has more detailed information about Node, Grunt, Solidus, Sass, and the installation process.
+* The [Installing Solidus](/solidus/installing-solidus) guide has more detailed information about Node, Grunt, Solidus, Sass, and the installation process.
 
