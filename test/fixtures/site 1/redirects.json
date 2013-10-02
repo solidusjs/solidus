@@ -13,4 +13,8 @@
 	"from": "/redirect4",
 	"to": "/",
 	"end": "2000-1-1 00:00:00"
+}, {
+	"from": "/redirect5",
+	"to": "/",
+	"permanent": true
 }]
