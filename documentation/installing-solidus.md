@@ -1,20 +1,15 @@
 # Installing Solidus
 
-### Overview
-
-The heart of Solidus is a node.js server used to fetch JSON and serve pages. It can be easily run on a Mac or PC for development. It’s also [easily deployed](#) for production and has been [battle tested](http://sparkart.com) running sites serving millions of monthly pageviews.
-
-### Why node?
-
-[node.js](http://nodejs.org) is naturally the best way to work with JSON data on a server — everything is just JavaScript. This also makes it easy to share code and data with the browser. When the server and browser can work together in harmony, a superfast, seamless experience for visitors is the result. On top of this, the incredibly talented node community is hard at work on new ways to solve common challenges such as [working with assets](http://gruntjs.org) and [superfast page serving](http://expressjs.org).
-
-
 Installing node.js and npm
 -------------------------------------------------------------------------------------------
 
 ### What's Node.js?
 
 Node server written in JavaScript that is comprised of multiple modules installed by npm.Modules are very granular, which is good. If one module doesn't work out, it can be replaced by another.
+
+### Why node?
+
+[node.js](http://nodejs.org) is naturally the best way to work with JSON data on a server — everything is just JavaScript. This also makes it easy to share code and data with the browser. When the server and browser can work together in harmony, a superfast, seamless experience for visitors is the result. On top of this, the incredibly talented node community is hard at work on new ways to solve common challenges such as [working with assets](http://gruntjs.org) and [superfast page serving](http://expressjs.org).
 
 **[Download an Installer](http://nodejs.org/download)**
 
