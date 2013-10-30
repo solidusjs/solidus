@@ -290,6 +290,16 @@ describe( 'Solidus', function(){
 				});
 		});
 
+		it( 'Loads handlebars helpers', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request
+				.get('/helpers')
+				.end( function( err, res ){
+					assert( res.text === 'HANDLEBARS HELPERS LOADED' );
+					done();
+				});
+		});
+
 	});
 
 	describe( 'development', function(){
