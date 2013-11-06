@@ -37,6 +37,10 @@ describe( 'Solidus', function(){
 			nock('https://hipster.sparkart.net')
 				.get('/api/v1/resources/qwerty/my-resource-')
 				.reply( 200, { test: false });
+			nock('https://hipster.sparkart.net')
+				.matchHeader( 'key', 'resource_test' )
+				.get('/api/v1/resources/asdf/my-resource-4')
+				.reply( 200, { test: true });
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
 		});
@@ -149,6 +153,7 @@ describe( 'Solidus', function(){
 							assert( res.body.resources.test.test );
 							assert( res.body.resources.test2.test );
 							assert( res.body.resources.test3.test );
+							assert( res.body.resources.test4.test );
 							callback( err );
 						});
 				}
