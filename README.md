@@ -103,7 +103,7 @@ Dynamic segments can also be specified with directory names:
 **Page configuration** is done with a JSON object nested within a Handlebars comment at the top of a page view. This object can contain the following:
 
 - **title** - The title of the page. This is generally used to populate the `<title>` tag.
-- **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
+- **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL or resource options object.
 - **preprocessor** - The path to the preprocessor to use for this page. Relative to the preprocessors directory.
 - **layout** - The path to the layout to use for this page. Overrides automatically defined local layouts.
 
@@ -182,6 +182,23 @@ Here's a quick outline of how resources work:
 ...
 	"resources": {
 		"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
+	}
+...
+```
+
+> Resources can also be specified with an options object instead of a string. This object must include `url`, and may include `headers` and `auth`. `headers` is an object of request headers, and `auth` is a string that represents an HTTP Auth parameter.
+
+`doges/index.hbs`
+```html
+...
+    "resources": {
+        "doges": {
+            "url": "https://example.com/api/v2/resources/4521zb/such-doges",
+            "headers": {
+                "key": "123"
+            },
+            "auth": "user:pass"
+        }
 	}
 ...
 ```
