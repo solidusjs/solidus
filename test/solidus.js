@@ -184,7 +184,9 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/scripts/test.js').expect( 200, callback );
+					s_request.get('/scripts/test.js')
+						.expect( 200, callback )
+						.expect( 'cache-control', 'public, max-age=31536000' );
 				},
 				function( callback ){
 					s_request.get('/styles/test.css').expect( 200, callback );
