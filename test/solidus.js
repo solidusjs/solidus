@@ -461,6 +461,15 @@ describe( 'Solidus', function(){
 				});
 		});
 
+		it( 'Does not cache assets in development', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/scripts/test.js')
+				.expect( 'cache-control', 'public, max-age=0' )
+				.end( function( err, res ){
+					done();
+				});
+		});
+
 	});
 
 });
