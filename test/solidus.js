@@ -38,8 +38,30 @@ describe( 'Solidus', function(){
 				.get('/api/v1/resources/qwerty/my-resource-')
 				.reply( 200, { test: false });
 			nock('https://hipster.sparkart.net')
-				.matchHeader( 'key', 'resource_test' )
 				.get('/api/v1/resources/asdf/my-resource-4')
+				.matchHeader( 'key', 'resource_test' )
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/zxcv/my-resource-5')
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/poiu/my-resource-6')
+				.reply( 200, { test: true });
+			nock('https://hipster2.sparkart.net')
+				.get('/api/v1/resources/lkjh/my-resource-7')
+				.matchHeader( 'key', '12345' )
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/poiu/my-resource-8?test=true')
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/poiu/my-resource-9?test=3')
+				.reply( 200, { test: true });
+			nock('https://hipster.sparkart.net')
+				.get('/api/v1/resources/poiu/my-resource-9?test=')
+				.reply( 200, { test: false });
+			nock('https://hipster3.sparkart.net')
+				.get('/api/v1/resources/ghjk/my-resource-10?key=12345')
 				.reply( 200, { test: true });
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
@@ -154,6 +176,12 @@ describe( 'Solidus', function(){
 							assert( res.body.resources.test2.test );
 							assert( res.body.resources.test3.test );
 							assert( res.body.resources.test4.test );
+							assert( res.body.resources.test5.test );
+							assert( res.body.resources.test6.test );
+							assert( res.body.resources.test7.test );
+							assert( res.body.resources.test8.test );
+							assert( res.body.resources.test9.test );
+							assert( res.body.resources.test10.test );
 							callback( err );
 						});
 				}
