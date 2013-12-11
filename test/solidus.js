@@ -32,6 +32,7 @@ describe( 'Solidus', function(){
 			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
 			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
 			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
 			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
 			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
 			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
@@ -39,6 +40,7 @@ describe( 'Solidus', function(){
 			// empty dynamic segments
 			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
 			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
 		});
@@ -144,7 +146,7 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/.json?resource_test=3')
+					s_request.get('/.json?resource_test=3&resource_test2=4')
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
@@ -154,6 +156,7 @@ describe( 'Solidus', function(){
 							assert( res.body.resources['resource-options-url'].test );
 							assert( res.body.resources['resource-options-query'].test );
 							assert( res.body.resources['resource-options-headers'].test );
+							assert( res.body.resources['resource-options-double-dynamic-query'].test );
 							assert( res.body.resources['resource-options-dynamic-query'].test );
 							assert( res.body.resources['centralized-auth'].test );
 							assert( res.body.resources['centralized-auth-query'].test );
