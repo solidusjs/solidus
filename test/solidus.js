@@ -25,44 +25,20 @@ describe( 'Solidus', function(){
 				log_level: 0,
 				port: 9009
 			});
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/abcdefg/my-resource')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/zyxwvu/my-resource-2')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/qwerty/my-resource-3')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/qwerty/my-resource-')
-				.reply( 200, { test: false });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/asdf/my-resource-4')
-				.matchHeader( 'key', 'resource_test' )
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/zxcv/my-resource-5')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/poiu/my-resource-6')
-				.reply( 200, { test: true });
-			nock('https://hipster2.sparkart.net')
-				.get('/api/v1/resources/lkjh/my-resource-7')
-				.matchHeader( 'key', '12345' )
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/poiu/my-resource-8?test=true')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/poiu/my-resource-9?test=3')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/poiu/my-resource-9?test=')
-				.reply( 200, { test: false });
-			nock('https://hipster3.sparkart.net')
-				.get('/api/v1/resources/ghjk/my-resource-10?key=12345')
-				.reply( 200, { test: true });
+			// mock http endpoints for resources
+			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
+			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
+			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
+			// empty dynamic segments
+			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
 		});
@@ -172,16 +148,15 @@ describe( 'Solidus', function(){
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.resources.test.test );
-							assert( res.body.resources.test2.test );
-							assert( res.body.resources.test3.test );
-							assert( res.body.resources.test4.test );
-							assert( res.body.resources.test5.test );
-							assert( res.body.resources.test6.test );
-							assert( res.body.resources.test7.test );
-							assert( res.body.resources.test8.test );
-							assert( res.body.resources.test9.test );
-							assert( res.body.resources.test10.test );
+							assert( res.body.resources.basic.test );
+							assert( res.body.resources.basic2.test );
+							assert( res.body.resources['dynamic-segment'].test );
+							assert( res.body.resources['resource-options-url'].test );
+							assert( res.body.resources['resource-options-query'].test );
+							assert( res.body.resources['resource-options-headers'].test );
+							assert( res.body.resources['resource-options-dynamic-query'].test );
+							assert( res.body.resources['centralized-auth'].test );
+							assert( res.body.resources['centralized-auth-query'].test );
 							callback( err );
 						});
 				}

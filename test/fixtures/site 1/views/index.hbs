@@ -2,33 +2,32 @@
 {
 	"title": "test",
 	"resources": {
-		"test": "https://hipster.sparkart.net/api/v1/resources/abcdefg/my-resource",
-		"test2": "https://hipster.sparkart.net/api/v1/resources/zyxwvu/my-resource-2",
-		"test3": "https://hipster.sparkart.net/api/v1/resources/qwerty/my-resource-{resource_test}",
-		"test4": {
-			"url": "https://hipster.sparkart.net/api/v1/resources/asdf/my-resource-4",
-				"headers": {
-				"key": "resource_test"
-			}
+		"basic": "https://solid.us/basic/1",
+		"basic2": "https://solid.us/basic/2",
+		"dynamic-segment": "https://solid.us/dynamic/segment/{resource_test}",
+		"resource-options-url": {
+			"url": "https://solid.us/resource/options/url"
 		},
-		"test5": "https://hipster.sparkart.net/api/v1/resources/zxcv/my-resource-5",
-		"test6": {
-			"url": "https://hipster.sparkart.net/api/v1/resources/poiu/my-resource-6"
-		},
-		"test7": "https://hipster2.sparkart.net/api/v1/resources/lkjh/my-resource-7",
-		"test8": {
-			"url": "https://hipster.sparkart.net/api/v1/resources/poiu/my-resource-8",
+		"resource-options-query": {
+			"url": "https://solid.us/resource/options/query",
 			"query": {
 				"test": true
 			}
 		},
-		"test9": {
-			"url": "https://hipster.sparkart.net/api/v1/resources/poiu/my-resource-9",
+		"resource-options-headers": {
+			"url": "https://solid.us/resource/options/headers",
+			"headers": {
+				"key": "12345"
+			}
+		},
+		"resource-options-dynamic-query": {
+			"url": "https://solid.us/resource/options/dynamic/query",
 			"query": {
 				"test": "{resource_test}"
 			}
 		},
-		"test10": "https://hipster3.sparkart.net/api/v1/resources/ghjk/my-resource-10"
+		"centralized-auth": "https://a.solid.us/centralized/auth",
+		"centralized-auth-query": "https://b.solid.us/centralized/auth/query"
 	},
 	"preprocessor": "index.js"
 }
