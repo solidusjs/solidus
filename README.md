@@ -103,7 +103,7 @@ Dynamic segments can also be specified with directory names:
 **Page configuration** is done with a JSON object nested within a Handlebars comment at the top of a page view. This object can contain the following:
 
 - **title** - The title of the page. This is generally used to populate the `<title>` tag.
-- **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL.
+- **resources** - An object of resources the page will use. The key is the name of the resource, and the value is the URL or resource options object.
 - **preprocessor** - The path to the preprocessor to use for this page. Relative to the preprocessors directory.
 - **layout** - The path to the layout to use for this page. Overrides automatically defined local layouts.
 
@@ -186,6 +186,23 @@ Here's a quick outline of how resources work:
 ...
 ```
 
+> Resources can also be specified with an options object instead of a string. This object must include `url`, and may include `headers` and `auth`. `headers` is an object of request headers, and `auth` is a string that represents an HTTP Auth parameter.
+
+`doges/index.hbs`
+```html
+...
+    "resources": {
+        "doges": {
+            "url": "https://example.com/api/v2/resources/4521zb/such-doges",
+            "headers": {
+                "key": "123"
+            },
+            "auth": "user:pass"
+        }
+	}
+...
+```
+
 2) When the page is requested, the resources are fetched and their data is added to the `resources` object in the page's context. It looks something like this:
 
 Context in `/kitties`
@@ -238,6 +255,28 @@ Context in `/kitties/635bc?order=alpha`
 	...
 }
 ```
+
+#### Global Resource Configuration
+
+Certain resources will require an options, like a **query string** or **header**, in order to work. Since these resources can be used across many views, it can quickly get cumbersome to set these options every single time you include a resource. To fix this problem, you can set options for a resource (or group of resources) based on their url globally, using `auth.json`. This file is a set of resource configurations that will be mixed in to resources before they are fetched. Here's a simple example:
+
+`auth.json`
+```json
+{
+    "http://proxy.storyteller.io/*": {
+        "headers": {
+            "Api-Key": "0000aaaa-aa00-00aa-a00a-aaaa000000"
+        }    
+    },
+    "http://services.sparkart.net/*": {
+        "query": {
+            "key": "1111bbbb-bb11-11bb-b11b-bbbb111111"
+        }
+    }
+}
+```
+
+Now any resource that starts with `http://proxy.storyteller.io/` will mix in the data under that parameter, and any resource that starts with `http://services.sparkart.net/` will mix in the data under that parameter.
 
 #### Preprocessors
 

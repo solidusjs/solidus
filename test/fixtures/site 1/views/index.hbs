@@ -2,9 +2,38 @@
 {
 	"title": "test",
 	"resources": {
-		"test": "https://hipster.sparkart.net/api/v1/resources/abcdefg/my-resource",
-		"test2": "https://hipster.sparkart.net/api/v1/resources/zyxwvu/my-resource-2",
-		"test3": "https://hipster.sparkart.net/api/v1/resources/qwerty/my-resource-{resource_test}"
+		"basic": "https://solid.us/basic/1",
+		"basic2": "https://solid.us/basic/2",
+		"dynamic-segment": "https://solid.us/dynamic/segment/{resource_test}",
+		"resource-options-url": {
+			"url": "https://solid.us/resource/options/url"
+		},
+		"resource-options-query": {
+			"url": "https://solid.us/resource/options/query",
+			"query": {
+				"test": true
+			}
+		},
+		"resource-options-headers": {
+			"url": "https://solid.us/resource/options/headers",
+			"headers": {
+				"key": "12345"
+			}
+		},
+		"resource-options-dynamic-query": {
+			"url": "https://solid.us/resource/options/dynamic/query",
+			"query": {
+				"test": "{resource_test}"
+			}
+		},
+		"resource-options-double-dynamic-query": {
+			"url": "https://solid.us/resource/options/double/dynamic/query?test2={resource_test2}",
+			"query": {
+				"test": "{resource_test}"
+			}
+		},
+		"centralized-auth": "https://a.solid.us/centralized/auth",
+		"centralized-auth-query": "https://b.solid.us/centralized/auth/query"
 	},
 	"preprocessor": "index.js"
 }

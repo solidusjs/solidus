@@ -25,18 +25,22 @@ describe( 'Solidus', function(){
 				log_level: 0,
 				port: 9009
 			});
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/abcdefg/my-resource')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/zyxwvu/my-resource-2')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/qwerty/my-resource-3')
-				.reply( 200, { test: true });
-			nock('https://hipster.sparkart.net')
-				.get('/api/v1/resources/qwerty/my-resource-')
-				.reply( 200, { test: false });
+			// mock http endpoints for resources
+			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
+			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
+			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
+			// empty dynamic segments
+			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', done );
 		});
@@ -142,13 +146,20 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/.json?resource_test=3')
+					s_request.get('/.json?resource_test=3&resource_test2=4')
 						.expect( 'Content-Type', /json/ )
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.resources.test.test );
-							assert( res.body.resources.test2.test );
-							assert( res.body.resources.test3.test );
+							assert( res.body.resources.basic.test );
+							assert( res.body.resources.basic2.test );
+							assert( res.body.resources['dynamic-segment'].test );
+							assert( res.body.resources['resource-options-url'].test );
+							assert( res.body.resources['resource-options-query'].test );
+							assert( res.body.resources['resource-options-headers'].test );
+							assert( res.body.resources['resource-options-double-dynamic-query'].test );
+							assert( res.body.resources['resource-options-dynamic-query'].test );
+							assert( res.body.resources['centralized-auth'].test );
+							assert( res.body.resources['centralized-auth-query'].test );
 							callback( err );
 						});
 				}
