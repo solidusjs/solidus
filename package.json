@@ -33,7 +33,7 @@
     "lru-cache": "~2.3.1",
     "glob": "~3.2.6",
     "handlebars": "~1.0.12",
-    "handlebars-helper": "~0.0.3"
+    "handlebars-helper": "~0.0.7"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
