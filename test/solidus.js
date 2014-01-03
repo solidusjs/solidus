@@ -195,7 +195,9 @@ describe( 'Solidus', function(){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
-					s_request.get('/scripts/test.js').expect( 200, callback );
+					s_request.get('/scripts/test.js')
+						.expect( 200, callback )
+						.expect( 'cache-control', 'public, max-age=31536000' );
 				},
 				function( callback ){
 					s_request.get('/styles/test.css').expect( 200, callback );
@@ -465,6 +467,15 @@ describe( 'Solidus', function(){
 				.expect( 'cache-control', null )
 				.expect( 'last-modified', null )
 				.expect( 'expires', null )
+				.end( function( err, res ){
+					done();
+				});
+		});
+
+		it( 'Does not cache assets in development', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/scripts/test.js')
+				.expect( 'cache-control', 'public, max-age=0' )
 				.end( function( err, res ){
 					done();
 				});
