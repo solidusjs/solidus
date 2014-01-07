@@ -1,4 +1,4 @@
 module.exports = function( context ){
-	context.test = true;
-	return context;
+	while(true){}
+	context.test = true;	
 };

@@ -178,11 +178,22 @@ describe( 'Solidus', function(){
 						.expect( 200 )
 						.end( function( err, res ){
 							assert( res.body.test === true );
-							assert( res.body.moment_test === '1995-12-25T00:00:00-08:00' );
-							assert( res.body.xdate_test === 'Mon Dec 25 1995 00:00:00 GMT-0800 (PST)' );
-							assert( res.body.underscore_test[0] === 'test' );
-							assert( res.body.sugar_test === 'test' )
 							callback( err );
+						});
+				},
+				function( callback ){
+					s_request.get('/infinite.json')
+						.expect( 'Content-Type', /json/ )
+						.expect( 200 )
+						.end( function( err, res ){
+							assert( !res.body.test );
+							s_request.get('/.json')
+								.expect( 'Content-Type', /json/ )
+								.expect( 200 )
+								.end( function( err, res ){
+									assert( res.body.test === true );
+									callback( err );
+								});
 						});
 				}
 			], function( err, results ){
@@ -403,7 +414,7 @@ describe( 'Solidus', function(){
 			}, FILESYSTEM_DELAY );
 		});
 
-		var test_preprocessor_contents = 'context.test = true';
+		var test_preprocessor_contents = 'module.exports=function(context){context.test = true;return context;};';
 
 		it( 'Adds preprocessors when a preprocessor js file is added', function( done ){
 			var s_request = request( solidus_server.router );
@@ -414,12 +425,13 @@ describe( 'Solidus', function(){
 					.end( function( err, res ){
 						if( err ) throw err;
 						assert( res.body.test );
+						fs.unlinkSync('preprocessors/test.js');
 						done();
 					});
 			}, FILESYSTEM_DELAY );
 		});
 
-		var test_preprocessor_contents_2 = 'context.test2 = true';
+		var test_preprocessor_contents_2 = 'module.exports=function(context){context.test2 = true;return context;};';
 
 		it( 'Updates preprocessors when their files change', function( done ){
 			var s_request = request( solidus_server.router );
