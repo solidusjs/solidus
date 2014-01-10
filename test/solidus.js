@@ -335,7 +335,8 @@ describe( 'Solidus', function(){
 			solidus_server = solidus.start({
 				log_level: 0,
 				port: 9009,
-				dev: true
+				dev: true,
+				livereload_port: 12345
 			});
 			// hack that will work until .start callback is complete
 			solidus_server.on( 'ready', function(){
@@ -461,7 +462,7 @@ describe( 'Solidus', function(){
 			}, FILESYSTEM_DELAY );
 		});
 
-		it( 'Passes a "dev" and "development" variables to view context', function( done ){
+		it( 'Passes dev variables to view context', function( done ){
 			var s_request = request( solidus_server.router );
 			s_request.get('/dev.json')
 				.expect( 200 )
@@ -469,6 +470,7 @@ describe( 'Solidus', function(){
 					if( err ) throw err;
 					assert( res.body.dev );
 					assert( res.body.development );
+					assert.equal( 12345, res.body.livereload_port );
 					done();
 				});
 		});
