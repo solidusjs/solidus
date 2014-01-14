@@ -67,6 +67,7 @@ Starts a solidus server using the current folder.
 
 - **--port, -p** specifies which port the Solidus server will listen on. By default it runs on port **8080**.
 - **--dev, -d** determines if the server runs in development mode or not. Development mode displays logging information and watches views/redirects/preprocessors for changes. This is set to **false** by default.
+- **--livereloadport, -r** specifies which port the LiveReload server will listen on (development mode only). By default it runs on port **35729**.
 - **--loglevel, -l** sets the level of logging the server should display. **0** - errors, **1** - warnings, **2** - status, **3** - debug
 
 ```

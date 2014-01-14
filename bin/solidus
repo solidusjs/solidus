@@ -7,7 +7,8 @@ commander.usage('[command] [option]');
 commander
 	.command('start')
 	.option( '-p, --port [type]', 'port for server to listen on [8080]', 8080 )
-	.option( '-d, --dev', 'run in developer mode' )
+	.option( '-d, --dev', 'run in development mode' )
+	.option( '-r, --livereloadport [type]', '(development mode only) port for LiveReload to listen on [35729]', 35729 )
 	.option( '-l, --loglevel [loglevel]', 'run at a specific log level [2]', 2 )
 	.description('Start Solidus')
 	.action( function( env ){
@@ -15,7 +16,8 @@ commander
 		solidus.start({
 			port: env.port,
 			dev: env.dev,
-			log_level: env.loglevel
+			log_level: env.loglevel,
+			livereload_port: env.livereloadport
 		});
 	});
 
