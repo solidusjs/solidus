@@ -13,7 +13,7 @@ Awesome things you can do with Solidus:
 - Easily deploy to services like [Appfog](https://www.appfog.com/), [Heroku](https://www.heroku.com/), [Nodejitsu](https://www.nodejitsu.com/), [AWS](http://aws.amazon.com/), etc.
 - Generate new sites from site templates (via grunt-init)
 
-Awesome things you can do with the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template):
+Awesome things you can do with the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template):
 
 - Use your view templates client side (via Grunt)
 - [Livereload](http://livereload.com/) as you update your SASS/CSS (via Grunt)
@@ -26,7 +26,7 @@ To install Solidus:
 - Install [Node.js](http://nodejs.org)
 - Run `npm install solidus -g`
 
-It should be installed! Go ahead and try `solidus -h` to see if it worked. You'll also want to make sure you have [Grunt](http://gruntjs.com) and [grunt-init](https://github.com/gruntjs/grunt-init) installed if you plan on using the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template).
+It should be installed! Go ahead and try `solidus -h` to see if it worked. You'll also want to make sure you have [Grunt](http://gruntjs.com) and [grunt-init](https://github.com/gruntjs/grunt-init) installed if you plan on using the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template).
 
 ## Usage
 
@@ -394,7 +394,7 @@ Here's an example `redirects.json`:
 
 Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory, and Solidus will serve them up.
 
-Solidus uses Grunt to compile SASS, client side templates, and run other client-side tasks. An ideal `Gruntfile` is included with the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template), but any gruntfile or build system can be used. For more information on using Grunt for asset compilation and management in a Solidus site, see the [Solidus Site Template](https://github.com/SparkartGroupInc/solidus-site-template) documentation.
+Solidus uses Grunt to compile SASS, client side templates, and run other client-side tasks. An ideal `Gruntfile` is included with the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template), but any gruntfile or build system can be used. For more information on using Grunt for asset compilation and management in a Solidus site, see the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template) documentation.
 
 =======
 
