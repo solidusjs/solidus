@@ -7,6 +7,7 @@ var async = require('async');
 var fs = require('fs');
 var request = require('supertest');
 var nock = require('nock');
+var zlib = require('zlib');
 var solidus = require('../solidus.js');
 
 var original_path = __dirname;
@@ -41,8 +42,31 @@ describe( 'Solidus', function(){
 			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
 			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
 			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
-			// hack that will work until .start callback is complete
-			solidus_server.on( 'ready', done );
+
+			async.parallel(
+				[
+					// compressed resources
+					function( callback ){
+						zlib.gzip( '{"test":true}', function( _, result ){
+							nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
+							callback();
+						});
+					},
+					function( callback ){
+						zlib.deflate( '{"test":true}', function( _, result ){
+							nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
+							callback();
+						});
+					},
+					// hack that will work until .start callback is complete
+					function( callback ){
+						solidus_server.on( 'ready', callback );
+					}
+				],
+				function(){
+					done();
+				}
+			);
 		});
 
 		afterEach( function(){
@@ -160,6 +184,8 @@ describe( 'Solidus', function(){
 							assert( res.body.resources['resource-options-dynamic-query'].test );
 							assert( res.body.resources['centralized-auth'].test );
 							assert( res.body.resources['centralized-auth-query'].test );
+							assert( res.body.resources['compressed-gzip'].test );
+							assert( res.body.resources['compressed-deflate'].test );
 							callback( err );
 						});
 				}
