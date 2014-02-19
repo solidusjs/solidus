@@ -14,6 +14,10 @@ var original_path = __dirname;
 var site1_path = path.join( original_path, 'fixtures', 'site 1' );
 var site2_path = path.join( original_path, 'fixtures', 'site2' );
 
+var normalizePath = function( file_path ){
+	return file_path.replace( /\//g, path.sep );
+};
+
 describe( 'Solidus', function(){
 
 	describe( 'production', function(){
@@ -281,7 +285,7 @@ describe( 'Solidus', function(){
 						.get('/deeply/nested/page/using/a_layout.json')
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.layout === 'deeply/nested/layout.hbs' );
+							assert( res.body.layout === normalizePath('deeply/nested/layout.hbs') );
 							callback( err );
 						});
 				},
@@ -290,7 +294,7 @@ describe( 'Solidus', function(){
 						.get('/deeply/nested/page.json')
 						.expect( 200 )
 						.end( function( err, res ){
-							assert( res.body.layout === 'deeply/nested/layout.hbs' );
+							assert( res.body.layout === normalizePath('deeply/nested/layout.hbs') );
 							callback( err );
 						});
 				}
