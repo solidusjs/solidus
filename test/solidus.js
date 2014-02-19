@@ -170,6 +170,19 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Makes URL information available in page context', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/.json')
+				.expect( 'Content-Type', /json/ )
+				.expect( 200 )
+				.end( function( err, res ){
+					assert( res.body.url );
+					assert( res.body.url.path === '/.json' );
+					if( err ) throw err;
+					done();
+				});
+		});
+
 		it( 'Fetches resources and adds them to the page context', function( done ){
 			var s_request = request( solidus_server.router );
 			async.parallel([
