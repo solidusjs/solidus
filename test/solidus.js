@@ -170,6 +170,17 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Returns 404s for unmatched routes', function( done ){
+			var s_request = request( solidus_server.router );
+			s_request.get('/nonexistent-url')
+				.expect( 404 )
+				.end( function( err, res ){
+					assert( res.text === '404 Not Found' );
+					if( err ) throw err;
+					done();
+				});
+		});
+
 		it( 'Makes URL information available in page context', function( done ){
 			var s_request = request( solidus_server.router );
 			s_request.get('/.json')
