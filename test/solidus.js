@@ -24,12 +24,7 @@ describe( 'Solidus', function(){
 
 		var solidus_server;
 
-		beforeEach( function( done ){
-			process.chdir( site1_path );
-			solidus_server = solidus.start({
-				log_level: 0,
-				port: 9009
-			});
+		before( function( done ){
 			// mock http endpoints for resources
 			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
 			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
@@ -47,30 +42,33 @@ describe( 'Solidus', function(){
 			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
 			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
 
-			async.parallel(
-				[
-					// compressed resources
-					function( callback ){
-						zlib.gzip( '{"test":true}', function( _, result ){
-							nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
-							callback();
-						});
-					},
-					function( callback ){
-						zlib.deflate( '{"test":true}', function( _, result ){
-							nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
-							callback();
-						});
-					},
-					// hack that will work until .start callback is complete
-					function( callback ){
-						solidus_server.on( 'ready', callback );
-					}
-				],
-				function(){
-					done();
+			async.parallel([
+				// compressed resources
+				function( callback ){
+					zlib.gzip( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
+						callback();
+					});
+				},
+				function( callback ){
+					zlib.deflate( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
+						callback();
+					});
 				}
-			);
+			],
+			function(){
+				done();
+			});
+		});
+
+		beforeEach( function( done ){
+			process.chdir( site1_path );
+			solidus_server = solidus.start({
+				log_level: 0,
+				port: 9009
+			});
+			solidus_server.on( 'ready', done );
 		});
 
 		afterEach( function(){
