@@ -5,6 +5,7 @@ var path = require('path');
 var assert = require('assert');
 var async = require('async');
 var fs = require('fs');
+var moment = require('moment');
 var request = require('supertest');
 var nock = require('nock');
 var zlib = require('zlib');
@@ -62,8 +63,32 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		var original_redirects = [];
+
 		beforeEach( function( done ){
 			process.chdir( site1_path );
+			// Generate time-based redirects
+			// These are used to ensure that temporary redirects are properly checked
+			original_redirects = fs.readFileSync( 'redirects.json', DEFAULT_ENCODING );
+			var original_redirects_arr = JSON.parse( original_redirects );
+			var redirect_date_format = 'YYYY-MM-DD HH:mm:ss';
+			var temporal_redirects = [{
+				start: moment().add( 's', 5 ).format( redirect_date_format ),
+				from: '/future-redirect',
+				to: '/'
+			}, {
+				start: moment().subtract( 's', 5 ).format( redirect_date_format ),
+				end: moment().add( 's', 5 ).format( redirect_date_format ),
+				from: '/current-redirect',
+				to: '/'
+			}, {
+				start: moment().subtract( 's', 10 ).format( redirect_date_format ),
+				end: moment().subtract( 's', 5 ).format( redirect_date_format ),
+				from: '/past-redirect',
+				to: '/'
+			}];
+			var combined_redirects = JSON.stringify( original_redirects_arr.concat( temporal_redirects ) );
+			fs.writeFileSync( 'redirects.json', combined_redirects, DEFAULT_ENCODING );
 			solidus_server = solidus.start({
 				log_level: 0,
 				port: 9009
@@ -73,6 +98,7 @@ describe( 'Solidus', function(){
 
 		afterEach( function(){
 			solidus_server.stop();
+			fs.writeFileSync( 'redirects.json', original_redirects, DEFAULT_ENCODING );
 			process.chdir( original_path );
 		});
 
@@ -288,6 +314,15 @@ describe( 'Solidus', function(){
 				},
 				function( callback ){
 					s_request.get('/redirect5').expect( 301, callback );
+				},
+				function( callback ){
+					s_request.get('/past-redirect').expect( 404, callback );
+				},
+				function( callback ){
+					s_request.get('/current-redirect').expect( 302, callback );
+				},
+				function( callback ){
+					s_request.get('/future-redirect').expect( 404, callback );
 				}
 			], function( err, results ){
 				if( err ) throw err;
