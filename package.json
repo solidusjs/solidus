@@ -34,7 +34,8 @@
     "glob": "~3.2.6",
     "handlebars": "~1.0.12",
     "handlebars-helper": "~0.0.9",
-    "worker-farm": "~0.3.1"
+    "worker-farm": "~0.3.1",
+    "raven": "^0.6.2"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
