@@ -17,4 +17,7 @@
 	"from": "/redirect5",
 	"to": "/",
 	"permanent": true
+}, {
+	"from": "/overridden-route",
+	"to": "/overridden-redirect"
 }]

@@ -348,6 +348,13 @@ describe( 'Solidus', function(){
 			});
 		});
 
+		it( 'Overrides page routes with redirect routes', function( done ){
+			s_request = request( solidus_server.router );
+			s_request.get('/overridden-route')
+				.expect( 302 )
+				.expect( 'location', '/overridden-redirect', done );
+		});
+
 		it( 'Sets the default layout', function(){
 			assert( solidus_server.handlebars.defaultLayout === 'layout' );
 		});
