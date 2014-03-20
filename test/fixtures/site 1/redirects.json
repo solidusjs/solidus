@@ -20,4 +20,9 @@
 }, {
 	"from": "/overridden_route",
 	"to": "/overridden_redirect"
+}, {
+	"from": "/overridden_route_2",
+	"to": "/overridden_redirect_2",
+	"start": "2000-1-1 00:00:00",
+	"end": "3000-1-1 00:00:00"
 }]

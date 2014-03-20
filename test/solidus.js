@@ -355,6 +355,11 @@ describe( 'Solidus', function(){
 				s_request.get('/overridden_route')
 					.expect( 302 )
 					.expect( 'location', '/overridden_redirect', cb );
+			},
+			function( cb ){
+				s_request.get('/overridden_route_2')
+					.expect( 302 )
+					.expect( 'location', '/overridden_redirect_2', cb );
 			}
 			],
 			function( err, results ){
