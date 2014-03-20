@@ -74,33 +74,33 @@ describe( 'Solidus', function(){
 			var redirect_date_format = 'YYYY-MM-DD HH:mm:ss';
 			var temporal_redirects = [{
 				start: moment().add( 's', 5 ).format( redirect_date_format ),
-				from: '/future-redirect',
+				from: '/future_redirect',
 				to: '/'
 			}, {
 				start: moment().subtract( 's', 5 ).format( redirect_date_format ),
 				end: moment().add( 's', 5 ).format( redirect_date_format ),
-				from: '/current-redirect',
+				from: '/current_redirect',
 				to: '/'
 			}, {
 				start: moment().subtract( 's', 10 ).format( redirect_date_format ),
 				end: moment().subtract( 's', 5 ).format( redirect_date_format ),
-				from: '/past-redirect',
+				from: '/past_redirect',
 				to: '/'
 			}];
 			var overlapping_redirects = [{
 				start: moment().add( 's', 5 ).format( redirect_date_format ),
-				from: '/overlapping-redirect',
-				to: '/overlapping-redirect-future'
+				from: '/overlapping_redirect',
+				to: '/overlapping_redirect_future'
 			}, {
 				start: moment().subtract( 's', 5 ).format( redirect_date_format ),
 				end: moment().add( 's', 5 ).format( redirect_date_format ),
-				from: '/overlapping-redirect',
-				to: '/overlapping-redirect-current'
+				from: '/overlapping_redirect',
+				to: '/overlapping_redirect_current'
 			}, {
 				start: moment().subtract( 's', 10 ).format( redirect_date_format ),
 				end: moment().subtract( 's', 5 ).format( redirect_date_format ),
-				from: '/overlapping-redirect',
-				to: '/overlapping-redirect-past'
+				from: '/overlapping_redirect',
+				to: '/overlapping_redirect_past'
 			}];
 			var combined_redirects = JSON.stringify( original_redirects_arr.concat( temporal_redirects, overlapping_redirects ) );
 			fs.writeFileSync( 'redirects.json', combined_redirects, DEFAULT_ENCODING );
@@ -331,16 +331,16 @@ describe( 'Solidus', function(){
 					s_request.get('/redirect5').expect( 301, callback );
 				},
 				function( callback ){
-					s_request.get('/past-redirect').expect( 404, callback );
+					s_request.get('/past_redirect').expect( 404, callback );
 				},
 				function( callback ){
-					s_request.get('/current-redirect').expect( 302, callback );
+					s_request.get('/current_redirect').expect( 302, callback );
 				},
 				function( callback ){
-					s_request.get('/future-redirect').expect( 404, callback );
+					s_request.get('/future_redirect').expect( 404, callback );
 				},
 				function( callback ){
-					s_request.get('/overlapping-redirect').expect( 'location', '/overlapping-redirect-current', callback );
+					s_request.get('/overlapping_redirect').expect( 'location', '/overlapping_redirect_current', callback );
 				}
 			], function( err, results ){
 				if( err ) throw err;
@@ -352,15 +352,11 @@ describe( 'Solidus', function(){
 			s_request = request( solidus_server.router );
 			async.parallel([
 			function( cb ){
-				s_request.get('/overridden-route')
+				s_request.get('/overridden_route')
 					.expect( 302 )
-					.expect( 'location', '/overridden-redirect', cb );
-			},
-			function( cb ){
-				s_request.get('/')
-					.expect( 302 )
-					.expect( 'location', '/overridden-index-redirect', cb );
-			}],
+					.expect( 'location', '/overridden_redirect', cb );
+			}
+			],
 			function( err, results ){
 				if( err ) throw err;
 				done();

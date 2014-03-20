@@ -18,9 +18,6 @@
 	"to": "/",
 	"permanent": true
 }, {
-	"from": "/overridden-route",
-	"to": "/overridden-redirect"
-}, {
-	"from": "/",
-	"to": "/overridden-index-redirect"
+	"from": "/overridden_route",
+	"to": "/overridden_redirect"
 }]
