@@ -20,4 +20,7 @@
 }, {
 	"from": "/overridden-route",
 	"to": "/overridden-redirect"
+}, {
+	"from": "/",
+	"to": "/overridden-index-redirect"
 }]

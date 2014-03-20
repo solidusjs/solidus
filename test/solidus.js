@@ -350,9 +350,21 @@ describe( 'Solidus', function(){
 
 		it( 'Overrides page routes with redirect routes', function( done ){
 			s_request = request( solidus_server.router );
-			s_request.get('/overridden-route')
-				.expect( 302 )
-				.expect( 'location', '/overridden-redirect', done );
+			async.parallel([
+			function( cb ){
+				s_request.get('/overridden-route')
+					.expect( 302 )
+					.expect( 'location', '/overridden-redirect', cb );
+			},
+			function( cb ){
+				s_request.get('/')
+					.expect( 302 )
+					.expect( 'location', '/overridden-index-redirect', cb );
+			}],
+			function( err, results ){
+				if( err ) throw err;
+				done();
+			});
 		});
 
 		it( 'Sets the default layout', function(){
