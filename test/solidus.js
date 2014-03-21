@@ -24,48 +24,9 @@ describe( 'Solidus', function(){
 	describe( 'production', function(){
 
 		var solidus_server;
-
-		before( function( done ){
-			// mock http endpoints for resources
-			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
-			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
-			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
-			// empty dynamic segments
-			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
-			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
-			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
-
-			async.parallel([
-				// compressed resources
-				function( callback ){
-					zlib.gzip( '{"test":true}', function( _, result ){
-						nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
-						callback();
-					});
-				},
-				function( callback ){
-					zlib.deflate( '{"test":true}', function( _, result ){
-						nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
-						callback();
-					});
-				}
-			],
-			function(){
-				done();
-			});
-		});
-
 		var original_redirects = [];
 
-		beforeEach( function( done ){
+		before( function( done ){
 			process.chdir( site1_path );
 			// Generate time-based redirects
 			// These are used to ensure that temporary redirects are properly checked
@@ -104,6 +65,45 @@ describe( 'Solidus', function(){
 			}];
 			var combined_redirects = JSON.stringify( original_redirects_arr.concat( temporal_redirects, overlapping_redirects ) );
 			fs.writeFileSync( 'redirects.json', combined_redirects, DEFAULT_ENCODING );
+
+			// mock http endpoints for resources
+			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
+			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
+			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
+			// empty dynamic segments
+			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
+
+			async.parallel([
+				// compressed resources
+				function( callback ){
+					zlib.gzip( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
+						callback();
+					});
+				},
+				function( callback ){
+					zlib.deflate( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
+						callback();
+					});
+				}
+			],
+			function(){
+				done();
+			});
+		});
+
+		beforeEach( function( done ){
 			solidus_server = solidus.start({
 				log_level: 0,
 				port: 9009
@@ -113,6 +113,9 @@ describe( 'Solidus', function(){
 
 		afterEach( function(){
 			solidus_server.stop();
+		});
+
+		after( function(){
 			fs.writeFileSync( 'redirects.json', original_redirects, DEFAULT_ENCODING );
 			process.chdir( original_path );
 		});
