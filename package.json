@@ -2,7 +2,7 @@
   "name": "solidus",
   "version": "0.1.6",
   "bugs": {
-    "url": "https://github.com/SparkartGroupInc/solidus/issues"
+    "url": "https://github.com/solidusjs/solidus/issues"
   },
   "author": {
     "name": "Timothy Kempf",
@@ -13,7 +13,7 @@
   "main": "solidus.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SparkartGroupInc/solidus.git"
+    "url": "https://github.com/solidusjs/solidus.git"
   },
   "dependencies": {
     "express": "3.1.x",
