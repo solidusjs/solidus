@@ -10,6 +10,7 @@ var request = require('supertest');
 var nock = require('nock');
 var zlib = require('zlib');
 var solidus = require('../solidus.js');
+var Page = require('../lib/page.js');
 
 var original_path = __dirname;
 var site1_path = path.join( original_path, 'fixtures', 'site 1' );
@@ -24,45 +25,6 @@ describe( 'Solidus', function(){
 	describe( 'production', function(){
 
 		var solidus_server;
-
-		before( function( done ){
-			// mock http endpoints for resources
-			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
-			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
-			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
-			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
-			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
-			// empty dynamic segments
-			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
-			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
-			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
-
-			async.parallel([
-				// compressed resources
-				function( callback ){
-					zlib.gzip( '{"test":true}', function( _, result ){
-						nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
-						callback();
-					});
-				},
-				function( callback ){
-					zlib.deflate( '{"test":true}', function( _, result ){
-						nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
-						callback();
-					});
-				}
-			],
-			function(){
-				done();
-			});
-		});
-
 		var original_redirects = [];
 
 		beforeEach( function( done ){
@@ -104,11 +66,47 @@ describe( 'Solidus', function(){
 			}];
 			var combined_redirects = JSON.stringify( original_redirects_arr.concat( temporal_redirects, overlapping_redirects ) );
 			fs.writeFileSync( 'redirects.json', combined_redirects, DEFAULT_ENCODING );
-			solidus_server = solidus.start({
-				log_level: 0,
-				port: 9009
+			Page.cache.reset();
+
+			// mock http endpoints for resources
+			nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
+			nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
+			nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
+			nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
+			nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
+			nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
+			// empty dynamic segments
+			nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
+			nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=&test=').reply( 200, { test: false } );
+
+			async.parallel([
+				// compressed resources
+				function( callback ){
+					zlib.gzip( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
+						callback();
+					});
+				},
+				function( callback ){
+					zlib.deflate( '{"test":true}', function( _, result ){
+						nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
+						callback();
+					});
+				}
+			],
+			function(){
+				solidus_server = solidus.start({
+					log_level: 0,
+					port: 9009
+				});
+				solidus_server.on( 'ready', done );
 			});
-			solidus_server.on( 'ready', done );
 		});
 
 		afterEach( function(){
@@ -352,7 +350,7 @@ describe( 'Solidus', function(){
 			assert( solidus_server.handlebars.defaultLayout === 'layout' );
 		});
 
-		it( 'Uses the layout closest to a page view', function( done ){	
+		it( 'Uses the layout closest to a page view', function( done ){
 			var s_request = request( solidus_server.router );
 			async.parallel([
 				function( callback ){
@@ -413,7 +411,7 @@ describe( 'Solidus', function(){
 				.expect( 'cache-control', 'public, max-age='+ ( 60 * 5 ) )
 				.end( function( err, res ){
 					assert( new Date( res.headers['last-modified'] ) < new Date );
-					assert( new Date( res.headers['expires'] ) > new Date ); 
+					assert( new Date( res.headers['expires'] ) > new Date );
 					if( err ) throw err;
 					done();
 				});
@@ -429,6 +427,155 @@ describe( 'Solidus', function(){
 				});
 		});
 
+		describe( 'resource caching', function(){
+
+			function test_caching(cache1, cache2, callback) {
+				request(solidus_server.router).get('/caching.json').end(function(err, res) {
+					if (err) throw err;
+					if (cache1) {
+						assert.equal(cache1, res.body.resources.cache1.test);
+					} else {
+						assert(!res.body.resources.cache1);
+					}
+					if (cache2) {
+						assert.equal(cache2, res.body.resources.cache2.test);
+					} else {
+						assert(!res.body.resources.cache2);
+					}
+					callback();
+				});
+			}
+
+			beforeEach(function() {
+				nock('https://solid.us').get('/cache/2').reply( 200, { test: 2 } );
+			});
+
+			it( 'Caches the resources', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 1 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						test_caching(1, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Does not cache resources with invalid status codes', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 500, { test: 1 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 3 } );
+						test_caching(3, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Does not cache resources with invalid data', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, 'not json' );
+						test_caching(null, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 3 } );
+						test_caching(3, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Renders expired cached resources before refreshing them', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 3 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						test_caching(3, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Locks expired cached resources while being refreshed', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+						test_caching(1, 2, cb);
+					},
+					function(cb1) {
+						// Delay the response, to make sure the next request comes in before the first one is refreshed
+						nock('https://solid.us').get('/cache/1').delay(25).reply( 200, { test: 3 }, { 'Cache-Control': 'max-age=0' } );
+						async.parallel([
+							function(cb2) {
+								test_caching(1, 2, cb2);
+							},
+							function(cb2) {
+								test_caching(1, 2, cb2);
+							}
+							], cb1);
+					},
+					function(cb) {
+						// The previous requests are done, but the refresh might not, wait to make sure the lock is released
+						setTimeout(function() {
+							nock('https://solid.us').get('/cache/1').reply( 200, { test: 4 } );
+							test_caching(3, 2, cb);
+						}, 50);
+					},
+					function(cb) {
+						test_caching(4, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Unlocks expired cached resources with invalid status codes', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 500, { test: 3 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 4 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						test_caching(4, 2, cb);
+					}
+					], done);
+			});
+
+			it( 'Unlocks expired cached resources with invalid data', function( done ){
+				async.series([
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, 'not json' );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						nock('https://solid.us').get('/cache/1').reply( 200, { test: 4 } );
+						test_caching(1, 2, cb);
+					},
+					function(cb) {
+						test_caching(4, 2, cb);
+					}
+					], done);
+			});
+
+		});
 	});
 
 	describe( 'development', function(){

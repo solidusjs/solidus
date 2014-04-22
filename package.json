@@ -40,7 +40,8 @@
   "devDependencies": {
     "mocha": "~1.9.0",
     "supertest": "~0.6.0",
-    "nock": "~0.18.0"
+    "nock": "~0.27.3",
+    "timekeeper": "0.0.4"
   },
   "bin": {
     "solidus": "./bin/solidus"
