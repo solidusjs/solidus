@@ -55,8 +55,8 @@ You can also run Solidus manually in code if you need to. In order to do this, j
 ```js
 var solidus = require('solidus');
 solidus.start({
-	port: 9001,
-	dev: true
+  port: 9001,
+  dev: true
 });
 ```
 
@@ -115,14 +115,14 @@ Here's a quick example of what a page configuration might look like:
 `index.hbs`
 ```html
 {{!
-	{
-		"title": "Home",
-		"resources": {
-			"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties",
-			"doggies": "https://example.com/api/v1/resources/4657df/tims-favorite-doggies"
-		},
-		"preprocessor": "home.js"
-	}
+  {
+    "title": "Home",
+    "resources": {
+      "kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties",
+      "doggies": "https://example.com/api/v1/resources/4657df/tims-favorite-doggies"
+    },
+    "preprocessor": "home.js"
+  }
 }}
 ```
 
@@ -143,30 +143,30 @@ Here's an example context:
 
 ```json
 {
-	"page": {
-		"title": "Character Page",
-		"path": "/Users/Sparkart/solidus-test-site/views/characters/{hero_id}.hbs"
-	},
-	"parameters": {
-		"hero_id": "92352"
-	},
-	"query": {
-		"debug": "true"
-	},
-	"resources": {
-		"character": {
-			"id": 92352,
-			"name": "UUUGUUUUUUUU",
-			"class": "demon-hunter",
-			"gender": "0"
-			...
-		}
-	},
-	"assets": {
-		"scripts": "<script src=\"/compiled/scripts.js\"></script>",
-		"styles": "<link rel=\"stylesheet\" href=\"/compiled/styles.css\" />"
-	},
-	"layout": "layout.hbs"
+  "page": {
+    "title": "Character Page",
+    "path": "/Users/Sparkart/solidus-test-site/views/characters/{hero_id}.hbs"
+  },
+  "parameters": {
+    "hero_id": "92352"
+  },
+  "query": {
+    "debug": "true"
+  },
+  "resources": {
+    "character": {
+      "id": 92352,
+      "name": "UUUGUUUUUUUU",
+      "class": "demon-hunter",
+      "gender": "0"
+      ...
+    }
+  },
+  "assets": {
+    "scripts": "<script src=\"/compiled/scripts.js\"></script>",
+    "styles": "<link rel=\"stylesheet\" href=\"/compiled/styles.css\" />"
+  },
+  "layout": "layout.hbs"
 }
 ```
 
@@ -183,9 +183,9 @@ Here's a quick outline of how resources work:
 `kitties/index.hbs`
 ```html
 ...
-	"resources": {
-		"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
-	}
+  "resources": {
+    "kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
+  }
 ...
 ```
 
@@ -194,15 +194,15 @@ Here's a quick outline of how resources work:
 `doges/index.hbs`
 ```html
 ...
-    "resources": {
-        "doges": {
-            "url": "https://example.com/api/v2/resources/4521zb/such-doges",
-            "headers": {
-                "key": "123"
-            },
-            "auth": "user:pass"
-        }
-	}
+  "resources": {
+    "doges": {
+      "url": "https://example.com/api/v2/resources/4521zb/such-doges",
+      "headers": {
+        "key": "123"
+      },
+      "auth": "user:pass"
+    }
+  }
 ...
 ```
 
@@ -211,14 +211,14 @@ Here's a quick outline of how resources work:
 Context in `/kitties`
 ```json
 {
-	...
-	"resources": {
-		"kitties": {
-			"count": 3,
-			"results": ["Wesley", "Twizzler", "Pixel"]
-		}
-	}
-	...
+  ...
+  "resources": {
+    "kitties": {
+      "count": 3,
+      "results": ["Wesley", "Twizzler", "Pixel"]
+    }
+  }
+  ...
 }
 ```
 
@@ -227,7 +227,7 @@ Context in `/kitties`
 ```html
 <script>{{{context}}}</script>
 <script>
-	alert( 'Here are the kitties!', solidus.context.resources.kitties.results );
+  alert( 'Here are the kitties!', solidus.context.resources.kitties.results );
 </script>
 ```
 
@@ -238,9 +238,9 @@ Sometimes resources will need to be requested with parameters that change dynami
 `kitties/{resource_id}.hbs`
 ```json
 ...
-    "resources": {
-    	"kitties": "https://example.come/api/v1/resources/{resource_id}/kitties?order={order}"
-	}
+  "resources": {
+    "kitties": "https://example.come/api/v1/resources/{resource_id}/kitties?order={order}"
+  }
 ...
 ```
 
@@ -248,14 +248,14 @@ Context in `/kitties/635bc?order=alpha`
 (result from the resource: `https://example.come/api/v1/resources/635bc/kitties?order=alpha`)
 ```json
 {
-	...
-	"resources": {
-		"kitties": {
-			"count": 3,
-			"results": ["Pixel", "Twizzler", "Wesley"]
-		}
-	}
-	...
+  ...
+  "resources": {
+    "kitties": {
+      "count": 3,
+      "results": ["Pixel", "Twizzler", "Wesley"]
+    }
+  }
+  ...
 }
 ```
 
@@ -266,16 +266,16 @@ Certain resources will require an options, like a **query string** or **header**
 `auth.json`
 ```json
 {
-    "http://proxy.storyteller.io/*": {
-        "headers": {
-            "Api-Key": "0000aaaa-aa00-00aa-a00a-aaaa000000"
-        }    
-    },
-    "http://services.sparkart.net/*": {
-        "query": {
-            "key": "1111bbbb-bb11-11bb-b11b-bbbb111111"
-        }
+  "http://proxy.storyteller.io/*": {
+    "headers": {
+      "Api-Key": "0000aaaa-aa00-00aa-a00a-aaaa000000"
     }
+  },
+  "http://services.sparkart.net/*": {
+    "query": {
+      "key": "1111bbbb-bb11-11bb-b11b-bbbb111111"
+    }
+  }
 }
 ```
 
@@ -288,46 +288,46 @@ If the data returned in a resource isn't quite right for a template, a **preproc
 `preprocessors/kitties.js`
 ```javascript
 module.exports = function( context ){
-	for( var i in context.resources.kitties.results ){
-		context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
-	}
-	return context;
+  for( var i in context.resources.kitties.results ){
+    context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
+  }
+  return context;
 };
 ```
 
 `views/kitties/index.hbs`
 ```html
 ...
-	"resources": {
-		"kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
-	},
-	"preprocessor": "kitties.js"
+  "resources": {
+    "kitties": "https://example.com/api/v1/resources/5632ac/tims-favorite-kitties"
+  },
+  "preprocessor": "kitties.js"
 ...
 ```
 
 Original context in `/kitties`
 ```json
 {
-	...
-	"resources": {
-		"kitties": {
-			"count": 3,
-			"results": ["Wesley","Twizzler","Pixel"]
-		}
-	}
+  ...
+  "resources": {
+    "kitties": {
+      "count": 3,
+      "results": ["Wesley","Twizzler","Pixel"]
+    }
+  }
 }
 ```
 
 Processed context in `/kitties`
 ```json
 {
-	...
-	"resources": {
-		"kitties": {
-			"count": 3,
-			"results": ["WESLEY","TWIZZER","PIXEL"]
-		}
-	}
+  ...
+  "resources": {
+    "kitties": {
+      "count": 3,
+      "results": ["WESLEY","TWIZZER","PIXEL"]
+    }
+  }
 }
 ```
 
@@ -338,21 +338,21 @@ By default, the following libraries are available for use in preprocessors by us
 ```js
 var _ = require('underscore');
 module.exports = function( context ){
-	context.resources.kitties.results = _.shuffle( context.resources.kitties.results );
-	return context;
+  context.resources.kitties.results = _.shuffle( context.resources.kitties.results );
+  return context;
 };
 ```
 
 Processed context in `/kitties`
 ```json
 {
-	...
-	"resources": {
-		"kitties": {
-			"count": 3,
-			"results": ["Pixel","Twizzler","Wesley"]
-		}
-	}
+  ...
+  "resources": {
+    "kitties": {
+      "count": 3,
+      "results": ["Pixel","Twizzler","Wesley"]
+    }
+  }
 }
 ```
 
@@ -366,25 +366,25 @@ Here's an example `redirects.json`:
 
 ```json
 [{
-	"from": "/redirect1",
-	"to": "/"
+  "from": "/redirect1",
+  "to": "/"
 }, {
-	"from": "/redirect2",
-	"to": "/",
-	"start": "2000-1-1 00:00:00"
+  "from": "/redirect2",
+  "to": "/",
+  "start": "2000-1-1 00:00:00"
 }, {
-	"from": "/redirect3",
-	"to": "/",
-	"start": "2000-1-1 00:00:00",
-	"end": "2014-1-1 00:00:00"
+  "from": "/redirect3",
+  "to": "/",
+  "start": "2000-1-1 00:00:00",
+  "end": "2014-1-1 00:00:00"
 }, {
-	"from": "/redirect4",
-	"to": "/",
-	"end": "2000-1-1 00:00:00"
+  "from": "/redirect4",
+  "to": "/",
+  "end": "2000-1-1 00:00:00"
 }, {
-	"from": "/redirect5",
-	"to": "/",
-	"permanent": true
+  "from": "/redirect5",
+  "to": "/",
+  "permanent": true
 }]
 ```
 
