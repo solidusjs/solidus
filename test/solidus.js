@@ -69,17 +69,17 @@ describe( 'Solidus', function(){
       Page.cache.reset();
 
       // mock http endpoints for resources
-      nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
-      nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
-      nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
-      nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-      nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: true } );
-      nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: true } );
+      nock('https://solid.us').get('/basic/1').reply( 200, { test: '/basic/1' } );
+      nock('https://solid.us').get('/basic/2').times(2).reply( 200, { test: '/basic/2' } );
+      nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: '/dynamic/segment/3' } );
+      nock('https://solid.us').get('/resource/options/url').reply( 200, { test: '/resource/options/url' } );
+      nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: '/resource/options/query?test=true' } );
+      nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: '/resource/options/dynamic/query?test=3' } );
+      nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: '/resource/options/double/dynamic/query?test2=4&test=3' } );
+      nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: '/centralized/auth/query' } );
+      nock('https://solid.us').get('/resource/options/headers').matchHeader( 'key', '12345' ).reply( 200, { test: '/resource/options/headers' } );
+      nock('https://a.solid.us').get('/centralized/auth').matchHeader( 'key', '12345' ).reply( 200, { test: '/centralized/auth' } );
+      nock('https://b.solid.us').get('/centralized/auth/query?key=12345').reply( 200, { test: '/centralized/auth/query?key=12345' } );
       // empty dynamic segments
       nock('https://solid.us').get('/dynamic/segment/').reply( 200, { test: false } );
       nock('https://solid.us').get('/resource/options/dynamic/query?test=').reply( 200, { test: false } );
@@ -88,13 +88,13 @@ describe( 'Solidus', function(){
       async.parallel([
         // compressed resources
         function( callback ){
-          zlib.gzip( '{"test":true}', function( _, result ){
+          zlib.gzip( '{"test":"/compressed/gzip"}', function( _, result ){
             nock('https://solid.us').get('/compressed/gzip').reply( 200, result, { 'Content-Encoding': 'gzip' } );
             callback();
           });
         },
         function( callback ){
-          zlib.deflate( '{"test":true}', function( _, result ){
+          zlib.deflate( '{"test":"/compressed/deflate"}', function( _, result ){
             nock('https://solid.us').get('/compressed/deflate').reply( 200, result, { 'Content-Encoding': 'deflate' } );
             callback();
           });
@@ -231,6 +231,26 @@ describe( 'Solidus', function(){
         });
     });
 
+    it( 'Finds the list of partials used by each page', function( done ){
+      var dir = path.join(site1_path, 'views')
+      var partials = [
+        path.join(dir, 'partial1.hbs'),
+        path.join(dir, 'partial1.hbs'),
+        path.join(dir, 'partial1.hbs'),
+        path.join(dir, 'partial2.hbs'),
+        path.join(dir, 'partial2.hbs'),
+        path.join(dir, 'partial3.hbs'),
+        path.join(dir, 'partial3.hbs'),
+        path.join(dir, 'partial/4.hbs'),
+        path.join(dir, 'partial9.hbs'),
+        path.join(dir, "partial'10.hbs"),
+        path.join(dir, 'partial11.hbs'),
+        path.join(dir, 'partial"12.hbs')
+      ]
+      assert.deepEqual(solidus_server.views[path.join(dir, 'multiple_partials.hbs')].params.partials, partials)
+      done()
+    });
+
     it( 'Fetches resources and adds them to the page context', function( done ){
       var s_request = request( solidus_server.router );
       async.parallel([
@@ -251,6 +271,30 @@ describe( 'Solidus', function(){
               assert( res.body.resources['centralized-auth-query'].test );
               assert( res.body.resources['compressed-gzip'].test );
               assert( res.body.resources['compressed-deflate'].test );
+              callback( err );
+            });
+        }
+      ], function( err, results ){
+        if( err ) throw err;
+        done();
+      });
+    });
+
+    it( 'Fetches partials resources and adds them to the page context', function( done ){
+      var s_request = request( solidus_server.router );
+      async.parallel([
+        function( callback ){
+          s_request.get('/page_with_resources_and_partials.json')
+            .expect( 'Content-Type', /json/ )
+            .expect( 200 )
+            .end( function( err, res ){
+              var resources = {
+                'page-resource': {test: '/basic/1'},
+                'partial1-resource': {test: '/basic/2'},
+                'partial2-resource': {test: '/basic/2'}
+              }
+              assert.equal(res.body.page.title, 'test');
+              assert.deepEqual(res.body.resources, resources);
               callback( err );
             });
         }
@@ -285,6 +329,30 @@ describe( 'Solidus', function(){
                   assert( res.body.test === true );
                   callback( err );
                 });
+            });
+        }
+      ], function( err, results ){
+        if( err ) throw err;
+        done();
+      });
+    });
+
+    it( 'Preprocesses the context of partials', function( done ){
+      var s_request = request( solidus_server.router );
+      async.parallel([
+        function( callback ){
+          s_request.get('/page_with_resources_and_partials.json')
+            .expect( 'Content-Type', /json/ )
+            .expect( 200 )
+            .end( function( err, res ){
+              var preprocessedBy = [
+                'page_with_resources_and_partials.js',
+                'partial1_with_resources.js',
+                'partial2_with_resources.js',
+                'partial2_with_resources.js'
+              ]
+              assert.deepEqual(res.body.preprocessedBy, preprocessedBy);
+              callback( err );
             });
         }
       ], function( err, results ){
