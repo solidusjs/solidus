@@ -35,13 +35,15 @@
     "handlebars": "~1.0.12",
     "handlebars-helper": "~0.0.9",
     "worker-farm": "~0.3.1",
-    "raven": "^0.6.2"
+    "raven": "^0.6.2",
+    "socket.io": "~1.0.6"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
     "supertest": "~0.6.0",
     "nock": "~0.27.3",
-    "timekeeper": "0.0.4"
+    "timekeeper": "0.0.4",
+    "socket.io-client": "~1.0.6"
   },
   "bin": {
     "solidus": "./bin/solidus"

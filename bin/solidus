@@ -10,6 +10,8 @@ commander
   .option( '-d, --dev', 'run in development mode' )
   .option( '-r, --livereloadport [type]', '(development mode only) port for LiveReload to listen on [35729]', 35729 )
   .option( '-l, --loglevel [loglevel]', 'run at a specific log level [2]', 2 )
+  .option( '--logserverport [type]', 'port for log server to listen on' )
+  .option( '--logserverlevel [logserverlevel]', 'run log server at a specific log level [2]', 2 )
   .description('Start Solidus')
   .action( function( env ){
     var solidus = require('../solidus.js');
@@ -17,7 +19,9 @@ commander
       port: env.port,
       dev: env.dev,
       log_level: env.loglevel,
-      livereload_port: env.livereloadport
+      livereload_port: env.livereloadport,
+      log_server_port: env.logserverport,
+      log_server_level: env.logserverlevel
     });
   });
 
