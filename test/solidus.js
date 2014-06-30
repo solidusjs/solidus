@@ -427,6 +427,39 @@ describe( 'Solidus', function(){
         });
     });
 
+    it('Sets the X-Powered-By header for HTML requests', function(done) {
+      var s_request = request(solidus_server.router);
+      s_request
+        .get('/')
+        .expect('X-Powered-By', 'Solidus/' + require('../package.json').version)
+        .end(function(err, res) {
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('Sets the X-Powered-By header for JSON requests', function(done) {
+      var s_request = request(solidus_server.router);
+      s_request
+        .get('/.json')
+        .expect('X-Powered-By', 'Solidus/' + require('../package.json').version)
+        .end(function(err, res) {
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('Sets the X-Powered-By header for 404s', function(done) {
+      var s_request = request(solidus_server.router);
+      s_request
+        .get('/nonexistent-url')
+        .expect('X-Powered-By', 'Solidus/' + require('../package.json').version)
+        .end(function(err, res) {
+          if (err) throw err;
+          done();
+        });
+    });
+
     describe( 'resource caching', function(){
 
       function test_caching(cache1, cache2, callback) {
