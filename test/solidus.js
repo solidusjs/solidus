@@ -782,4 +782,45 @@ describe( 'Solidus', function(){
 
   });
 
+  describe('log server', function() {
+    var solidus_server;
+
+    beforeEach(function(done) {
+      process.chdir(site1_path);
+      solidus_server = solidus.start({
+        log_level: 0,
+        port: 9009,
+        log_server_port: 12345,
+        log_server_level: 3
+      });
+      solidus_server.on('ready', done);
+    });
+
+    afterEach(function() {
+      process.chdir(original_path);
+    });
+
+    it('Sends the logs to the web socket', function(done) {
+      var socket = require('socket.io-client')('http://localhost:12345');
+      socket.on('connect', function() {
+        // Our web socket client is connected, make a Solidus request then close the server
+        request(solidus_server.router).get('/helpers').end(function() {
+          solidus_server.stop();
+        });
+      });
+
+      var last_message;
+      socket.on('log', function(data) {
+        // Solidus emitted a log message, store it
+        last_message = data;
+      });
+
+      socket.on('disconnect', function() {
+        // The log server was closed, we're done
+        assert.equal(3, last_message.level);
+        assert(/\/helpers served in \d+ms/.test(last_message.message));
+        done();
+      });
+    });
+  });
 });
