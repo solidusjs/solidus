@@ -417,12 +417,13 @@ describe( 'Solidus', function(){
         });
     });
 
-    it( 'Loads handlebars helpers', function( done ){
+    it( 'Runs helpers after preprocessors', function( done ){
       var s_request = request( solidus_server.router );
       s_request
         .get('/helpers')
         .end( function( err, res ){
-          assert( res.text === 'HANDLEBARS HELPERS LOADED' );
+          assert( res.text.indexOf('SOLIDUS') > -1 ); // Handlebars-helper
+          assert( res.text.indexOf('Le Solidus sacrebleu !') > -1 ); // Site helper
           done();
         });
     });
@@ -742,6 +743,51 @@ describe( 'Solidus', function(){
           .end( function( err, res ){
             if( err ) throw err;
             assert( !res.body.test );
+            done();
+          });
+      }, FILESYSTEM_DELAY );
+    });
+
+    var helpers_js = "module.exports={uppercase:function(string){return string+' is uppercase';}};";
+    var helpers2_js = "module.exports={uppercase:function(string){return string+' is uppercase 2';}};";
+
+    it( 'Adds helpers when helpers.js is added', function( done ){
+      var s_request = request( solidus_server.router );
+      fs.writeFileSync( 'helpers.js', helpers_js, DEFAULT_ENCODING );
+      setTimeout( function(){
+        s_request
+          .get('/helpers')
+          .end( function( err, res ){
+            if( err ) throw err;
+            assert( res.text.indexOf('Site helpers loaded is uppercase') > -1 );
+            done();
+          });
+      }, FILESYSTEM_DELAY );
+    });
+
+    it( 'Updates helpers when helpers.js changes', function( done ){
+      var s_request = request( solidus_server.router );
+      fs.writeFileSync( 'helpers.js', helpers2_js, DEFAULT_ENCODING );
+      setTimeout( function(){
+        s_request
+          .get('/helpers')
+          .end( function( err, res ){
+            if( err ) throw err;
+            assert( res.text.indexOf('Site helpers loaded is uppercase 2') > -1 );
+            done();
+          });
+      }, FILESYSTEM_DELAY );
+    });
+
+    it( 'Removes helpers when helpers.js is deleted', function( done ){
+      var s_request = request( solidus_server.router );
+      fs.unlinkSync('helpers.js');
+      setTimeout( function(){
+        s_request
+          .get('/helpers')
+          .end( function( err, res ){
+            if( err ) throw err;
+            assert( res.text.indexOf('Site helpers loaded is uppercase') == -1 );
             done();
           });
       }, FILESYSTEM_DELAY );

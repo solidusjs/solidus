@@ -1,5 +1,12 @@
 {{!
 {
-  "layout": false
+  "layout": false,
+  "preprocessor": "helpers.js"
 }
-}}{{uppercase "Handlebars helpers loaded"}}
+}}
+
+{{! Handlebars-helper }}
+{{uppercase test_string}}
+
+{{! Site helper }}
+{{frenchify test_string}}
