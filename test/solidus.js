@@ -834,6 +834,7 @@ describe( 'Solidus', function(){
     beforeEach(function(done) {
       process.chdir(site1_path);
       solidus_server = solidus.start({
+        dev: true,
         log_level: 0,
         port: 9009,
         log_server_port: 12345,
@@ -850,7 +851,9 @@ describe( 'Solidus', function(){
       var socket = require('socket.io-client')('http://localhost:12345');
       socket.on('connect', function() {
         // Our web socket client is connected, make a Solidus request then close the server
-        request(solidus_server.router).get('/helpers').end(function() {
+        request(solidus_server.router).get('/helpers.json').end(function(err, res) {
+          if (err) throw err;
+          assert.equal(12345, res.body.log_server_port);
           solidus_server.stop();
         });
       });
@@ -864,7 +867,7 @@ describe( 'Solidus', function(){
       socket.on('disconnect', function() {
         // The log server was closed, we're done
         assert.equal(3, last_message.level);
-        assert(/\/helpers served in \d+ms/.test(last_message.message));
+        assert(/\/helpers preprocessed in \d+ms/.test(last_message.message));
         done();
       });
     });
