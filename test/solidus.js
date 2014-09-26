@@ -73,7 +73,7 @@ describe( 'Solidus', function(){
       nock('https://solid.us').get('/basic/2').reply( 200, { test: true } );
       nock('https://solid.us').get('/dynamic/segment/3').reply( 200, { test: true } );
       nock('https://solid.us').get('/resource/options/url').reply( 200, { test: true } );
-      nock('https://solid.us').get('/resource/options/query?test=true').reply( 200, { test: true } );
+      nock('https://solid.us').get('/resource/options/query?test=true&not,encoded=not;encoded').reply( 200, { test: true } );
       nock('https://solid.us').get('/resource/options/dynamic/query?test=3').reply( 200, { test: true } );
       nock('https://solid.us').get('/resource/options/double/dynamic/query?test2=4&test=3').reply( 200, { test: true } );
       nock('https://solid.us').get('/centralized/auth/query').reply( 200, { test: true } );
