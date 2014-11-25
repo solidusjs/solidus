@@ -31,8 +31,9 @@ describe( 'Solidus', function(){
       process.chdir( site1_path );
       // Generate time-based redirects
       // These are used to ensure that temporary redirects are properly checked
-      original_redirects = fs.readFileSync( 'redirects.json', DEFAULT_ENCODING );
-      var original_redirects_arr = JSON.parse( original_redirects );
+      original_redirects = fs.readFileSync( 'redirects.js', DEFAULT_ENCODING );
+      delete require.cache[require.resolve(site1_path + '/redirects.js')];
+      var original_redirects_arr = require(site1_path + '/redirects.js');
       var redirect_date_format = 'YYYY-MM-DD HH:mm:ss';
       var temporal_redirects = [{
         start: moment().add( 's', 5 ).format( redirect_date_format ),
@@ -64,8 +65,8 @@ describe( 'Solidus', function(){
         from: '/overlapping-redirect',
         to: '/overlapping-redirect-past'
       }];
-      var combined_redirects = JSON.stringify( original_redirects_arr.concat( temporal_redirects, overlapping_redirects ) );
-      fs.writeFileSync( 'redirects.json', combined_redirects, DEFAULT_ENCODING );
+      var combined_redirects = JSON.stringify( temporal_redirects.concat( overlapping_redirects ) );
+      fs.appendFileSync( 'redirects.js', ';module.exports = module.exports.concat(' + combined_redirects + ');', DEFAULT_ENCODING );
       Page.cache.reset();
 
       // mock http endpoints for resources
@@ -111,7 +112,7 @@ describe( 'Solidus', function(){
 
     afterEach( function(){
       solidus_server.stop();
-      fs.writeFileSync( 'redirects.json', original_redirects, DEFAULT_ENCODING );
+      fs.writeFileSync( 'redirects.js', original_redirects, DEFAULT_ENCODING );
       process.chdir( original_path );
     });
 
@@ -310,7 +311,7 @@ describe( 'Solidus', function(){
       });
     });
 
-    it( 'Creates redirects based on the contents of redirects.json', function( done ){
+    it( 'Creates redirects based on the contents of redirects.js', function( done ){
       var s_request = request( solidus_server.router );
       async.parallel([
         function( callback ){
@@ -327,6 +328,18 @@ describe( 'Solidus', function(){
         },
         function( callback ){
           s_request.get('/redirect5').expect( 301, callback );
+        },
+        function( callback ){
+          s_request.get('/redirect6/old/path').expect( 'location', '/new/path/old', callback );
+        },
+        function( callback ){
+          s_request.get('/redirect7/12-34-56-78').expect( 'location', '/new/56/12/78', callback );
+        },
+        function( callback ){
+          s_request.get('/redirect8/old/path').expect( 'location', '/new/path/OLD', callback );
+        },
+        function( callback ){
+          s_request.get('/redirect9/12-34-56-78').expect( 'location', '/new/56/12/1078', callback );
         },
         function( callback ){
           s_request.get('/past-redirect').expect( 404, callback );
@@ -657,48 +670,60 @@ describe( 'Solidus', function(){
       }, FILESYSTEM_DELAY );
     });
 
-    var redirects = [{
-      "from": "/redirect1",
-      "to": "/"
-    }];
-
-    it( 'Adds redirects when redirects.json is added', function( done ){
+    it( 'Adds redirects when redirects.js is added', function( done ){
       var s_request = request( solidus_server.router );
-      var redirects_json = JSON.stringify( redirects );
-      fs.writeFileSync( 'redirects.json', redirects_json, DEFAULT_ENCODING );
-      setTimeout( function(){
-        s_request.get('/redirect1').expect( 302, function( err ){
-          if( err ) throw err;
+      var redirects_json = JSON.stringify([{"from": "/redirect1", "to": "/"}]);
+      fs.writeFileSync( 'redirects.js', 'module.exports = ' + redirects_json, DEFAULT_ENCODING );
+      setTimeout(function() {
+        async.parallel([
+          function(callback) {
+            s_request.get('/redirect1').expect(302, callback);
+          },
+          function(callback) {
+            s_request.get('/redirect2').expect(404, callback);
+          },
+        ], function(err) {
+          if (err) throw err;
           done();
         });
-      }, FILESYSTEM_DELAY );
+      }, FILESYSTEM_DELAY);
     });
 
-    it( 'Updates redirects when redirects.json changes', function( done ){
+    it( 'Updates redirects when redirects.js changes', function( done ){
       var s_request = request( solidus_server.router );
-      redirects.push({
-        from: '/redirect2',
-        to: '/'
-      });
-      var redirects_json = JSON.stringify( redirects );
-      fs.writeFileSync( 'redirects.json', redirects_json, DEFAULT_ENCODING );
-      setTimeout( function(){
-        s_request.get('/redirect2').expect( 302, function( err ){
-          if( err ) throw err;
+      var redirects_json = JSON.stringify([{"from": "/redirect2", "to": "/"}]);
+      fs.writeFileSync( 'redirects.js', 'module.exports = ' + redirects_json, DEFAULT_ENCODING );
+      setTimeout(function() {
+        async.parallel([
+          function(callback) {
+            s_request.get('/redirect1').expect(404, callback);
+          },
+          function(callback) {
+            s_request.get('/redirect2').expect(302, callback);
+          },
+        ], function(err) {
+          if (err) throw err;
           done();
         });
-      }, FILESYSTEM_DELAY );
+      }, FILESYSTEM_DELAY);
     });
 
-    it( 'Removes redirects when redirects.json is deleted', function( done ){
+    it( 'Removes redirects when redirects.js is deleted', function( done ){
       var s_request = request( solidus_server.router );
-      fs.unlinkSync('redirects.json');
-      setTimeout( function(){
-        s_request.get('/redirect1').expect( 404, function( err ){
-          if( err ) throw err;
+      fs.unlinkSync('redirects.js');
+      setTimeout(function() {
+        async.parallel([
+          function(callback) {
+            s_request.get('/redirect1').expect(404, callback);
+          },
+          function(callback) {
+            s_request.get('/redirect2').expect(404, callback);
+          },
+        ], function(err) {
+          if (err) throw err;
           done();
         });
-      }, FILESYSTEM_DELAY );
+      }, FILESYSTEM_DELAY);
     });
 
     var test_preprocessor_contents = 'module.exports=function(context){context.test = true;return context;};';
