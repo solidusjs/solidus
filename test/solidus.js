@@ -262,6 +262,7 @@ describe( 'Solidus', function(){
     });
 
     it( 'Preprocesses the context of pages', function( done ){
+      this.timeout(3000); // /infinite.json should timeout after 2s
       var s_request = request( solidus_server.router );
       async.parallel([
         function( callback ){
@@ -269,6 +270,7 @@ describe( 'Solidus', function(){
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( function( err, res ){
+              if( err ) throw err;
               assert( res.body.test === true );
               callback( err );
             });
@@ -278,11 +280,13 @@ describe( 'Solidus', function(){
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( function( err, res ){
+              if( err ) throw err;
               assert( !res.body.test );
               s_request.get('/.json')
                 .expect( 'Content-Type', /json/ )
                 .expect( 200 )
                 .end( function( err, res ){
+                  if( err ) throw err;
                   assert( res.body.test === true );
                   callback( err );
                 });
