@@ -421,6 +421,17 @@ describe( 'Solidus', function(){
       });
     });
 
+    it( 'Makes partials available from node_modules', function( done ){
+      request(solidus_server.router)
+        .get('/partial_holder3/')
+        .expect(200)
+        .end(function(err, res) {
+          assert.ifError(err);
+          assert.equal(res.text, 'partial.hbs\nPartial from external module.\nPartial with same path as external partial (site 1/node_modules/extra/conflict).');
+          done();
+        });
+    });
+
     it( 'Sends appropriate cache headers with pages', function( done ){
       var s_request = request( solidus_server.router );
       s_request
