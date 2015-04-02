@@ -106,7 +106,7 @@ describe( 'Solidus', function(){
       ],
       function(){
         solidus_server = solidus.start({
-          log_level: 0,
+          log_level: -1,
           port: 9009
         });
         solidus_server.on( 'ready', done );
@@ -216,7 +216,7 @@ describe( 'Solidus', function(){
       s_request.get('/nonexistent-url')
         .expect( 404 )
         .end( function( err, res ){
-          assert( res.text === '404 Not Found' );
+          assert(res.text.indexOf('Not here!') > -1);
           if( err ) throw err;
           done();
         });
@@ -270,8 +270,73 @@ describe( 'Solidus', function(){
       });
     });
 
+    it('Renders an error with error.hbs when a mandatory resource has an error', function(done) {
+      var s_request = request(solidus_server.router);
+      async.parallel([
+        function(callback) {
+          // Bad fetched data
+          nock('https://solid.us').get('/error/mandatory?test=1').reply(200, 'Not JSON');
+          nock('https://solid.us').get('/error/optional?test=1').reply(200, {test: 1});
+          s_request.get('/with_resource_error?test=1')
+            .expect(500)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback(err);
+            });
+        },
+        function(callback) {
+          // 200 status and error in response message
+          nock('https://solid.us').get('/error/mandatory?test=2').reply(200, {status: 'error', error: 'Could not find such a thing'});
+          nock('https://solid.us').get('/error/optional?test=2').reply(200, {test: 2});
+          s_request.get('/with_resource_error?test=2')
+            .expect(404)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Not here!') > -1);
+              callback(err);
+            });
+        },
+        function(callback) {
+          // Bad status
+          nock('https://solid.us').get('/error/mandatory?test=3').reply(401, {error: 'Nice try'});
+          nock('https://solid.us').get('/error/optional?test=3').reply(200, {test: 3});
+          s_request.get('/with_resource_error?test=3')
+            .expect(401)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (401)!') > -1);
+              callback(err);
+            });
+        },
+        function(callback) {
+          // No error with mandatory resource
+          nock('https://solid.us').get('/error/mandatory?test=4').reply(200, {test: 4});
+          nock('https://solid.us').get('/error/optional?test=4').reply(401, {error: 'Nice try'});
+          s_request.get('/with_resource_error.json?test=4')
+            .expect(200)
+            .end(function(err, res) {
+              assert.equal(res.body.resources.mandatory.test, 4);
+              assert.equal(res.body.resources.optional, undefined);
+              callback(err);
+            });
+        },
+        function(callback) {
+          // Missing static resource
+          nock('https://solid.us').get('/cache/1').reply(404, {error: 'Could not find such a thing'});
+          nock('https://solid.us').get('/cache/2').reply(404, {error: 'Could not find such a thing'});
+          s_request.get('/with_all_features')
+            .expect(500)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback(err);
+            });
+        },
+      ], function(err, results) {
+        if (err) throw err;
+        done();
+      });
+    });
+
     it( 'Preprocesses the context of pages', function( done ){
-      this.timeout(3000); // /infinite.json should timeout after 2s
+      this.timeout(11000); // /infinite.json should timeout after 10s
       var s_request = request( solidus_server.router );
       async.parallel([
         function( callback ){
@@ -287,7 +352,7 @@ describe( 'Solidus', function(){
         function( callback ){
           s_request.get('/infinite.json')
             .expect( 'Content-Type', /json/ )
-            .expect( 200 )
+            .expect( 500 )
             .end( function( err, res ){
               if( err ) throw err;
               assert( !res.body.test );
@@ -303,6 +368,49 @@ describe( 'Solidus', function(){
         }
       ], function( err, results ){
         if( err ) throw err;
+        done();
+      });
+    });
+
+    it('Renders an error when the preprocessor has an error', function(done) {
+      var s_request = request(solidus_server.router);
+      async.parallel([
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=exception')
+            .expect(500)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=status_code')
+            .expect(401)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (401)!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=redirect')
+            .expect(302)
+            .expect('location', '/redirected', callback);
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=redirect_permanent')
+            .expect(301)
+            .expect('location', '/redirected', callback);
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=no_context')
+            .expect(500)
+            .end(function(err, res) {
+              assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback();
+            });
+        }
+      ], function(err) {
+        if (err) throw err;
         done();
       });
     });
@@ -537,7 +645,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache/1').reply( 500, { test: 1 } );
-            test_caching(1, 2, cb);
+            test_caching(null, 2, cb);
           },
           function(cb) {
             nock('https://solid.us').get('/cache/1').reply( 200, { test: 3 } );
@@ -705,7 +813,7 @@ describe( 'Solidus', function(){
           .expect('Content-Type', /json/)
           .end(function(err, res) {
             if (err) throw err;
-            assert.deepEqual(res.body, {error: 'Invalid JSON: Unexpected token h'});
+            assert.deepEqual(res.body, {status: 400, error: 'Invalid JSON', message: {error: 'Unexpected token h'}});
             done();
           });
       });
@@ -785,7 +893,7 @@ describe( 'Solidus', function(){
     beforeEach( function( done ){
       process.chdir( site2_path );
       solidus_server = solidus.start({
-        log_level: 0,
+        log_level: -1,
         port: 9009,
         dev: true,
         livereload_port: 12345
@@ -1004,6 +1112,37 @@ describe( 'Solidus', function(){
         });
     });
 
+    it('Renders the default error response when error.hbs is missing', function(done) {
+      var s_request = request(solidus_server.router);
+      async.parallel([
+        function(callback) {
+          // 200 status and error in response message
+          nock('https://solid.us').get('/error/mandatory?test=2').reply(200, {status: 'error', error: 'Could not find such a thing'});
+          nock('https://solid.us').get('/error/optional?test=2').reply(200, {test: 2});
+          s_request.get('/with_resource_error?test=2')
+            .expect(404)
+            .end(function(err, res) {
+              assert.equal(res.text, '404 Not Found');
+              callback(err);
+            });
+        },
+        function(callback) {
+          // Bad status
+          nock('https://solid.us').get('/error/mandatory?test=3').reply(401, {error: 'Nice try'});
+          nock('https://solid.us').get('/error/optional?test=3').reply(200, {test: 3});
+          s_request.get('/with_resource_error?test=3')
+            .expect(401)
+            .end(function(err, res) {
+              assert.equal(res.text, '401 Unauthorized');
+              callback(err);
+            });
+        }
+      ], function(err, results) {
+        if (err) throw err;
+        done();
+      });
+    });
+
   });
 
   describe('log server', function() {
@@ -1045,7 +1184,7 @@ describe( 'Solidus', function(){
       socket.on('disconnect', function() {
         // The log server was closed, we're done
         assert.equal(3, last_message.level);
-        assert(/\/helpers preprocessed in \d+ms/.test(last_message.message));
+        assert(/\/helpers \[200\] served in \d+ms/.test(last_message.message));
         done();
       });
     });
