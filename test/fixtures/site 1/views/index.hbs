@@ -11,8 +11,7 @@
     "resource-options-query": {
       "url": "https://solid.us/resource/options/query",
       "query": {
-        "test": true,
-        "not,encoded": "not;encoded"
+        "test": true
       }
     },
     "resource-options-headers": {
@@ -28,8 +27,10 @@
       }
     },
     "resource-options-double-dynamic-query": {
-      "url": "https://solid.us/resource/options/double/dynamic/query?test2={resource_test2}",
+      "url": "https://solid.us/resource/options/double/dynamic/query?a=,&b=%2C&test2={resource_test2}",
       "query": {
+        "c": ",",
+        "d": "%2C",
         "test": "{resource_test}"
       }
     },

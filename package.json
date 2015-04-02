@@ -37,7 +37,9 @@
     "worker-farm": "~1.1.0",
     "raven": "^0.6.2",
     "socket.io": "~1.0.6",
-    "continuation-local-storage": "~3.1.1"
+    "continuation-local-storage": "~3.1.1",
+    "solidus-client": "git+https://github.com/solidusjs/solidus-client.git#solidus-client",
+    "browserify-transform-tools": "~1.2.1"
   },
   "devDependencies": {
     "mocha": "~1.9.0",

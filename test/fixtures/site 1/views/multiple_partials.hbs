@@ -1,0 +1,37 @@
+{{!
+{
+  "title": "test"
+}
+}}
+
+{{>partial1}}
+{{>partial1}}
+{{>partial1 some-context}}
+
+{{>  partial2    }}
+{{>  partial2  some-context    }}
+
+{{>
+partial3
+}}
+{{>
+partial3
+some-context
+}}
+
+{{>partial/4}}
+
+{{!{{>partial5}}}}
+{{!
+  {{>partial6}}
+}}
+{{!--{{>partial7}}--}}
+{{!--
+  {{>partial8}}
+--}}
+
+{{>'partial9'}}
+{{>'partial\'10'}}
+
+{{>"partial11"}}
+{{>"partial\"12"}}
