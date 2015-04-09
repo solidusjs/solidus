@@ -1,6 +1,6 @@
 {
   "name": "solidus",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "bugs": {
     "url": "https://github.com/solidusjs/solidus/issues"
   },
@@ -38,7 +38,7 @@
     "raven": "^0.6.2",
     "socket.io": "~1.0.6",
     "continuation-local-storage": "~3.1.1",
-    "solidus-client": "^1.0.0",
+    "solidus-client": "^1.1.0",
     "browserify-transform-tools": "~1.2.1"
   },
   "devDependencies": {
