@@ -402,6 +402,15 @@ describe( 'Solidus', function(){
             .expect('location', '/redirected', callback);
         },
         function(callback) {
+          s_request.get('/with_preprocessor_error?error=invalid_redirect_array')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
           s_request.get('/with_preprocessor_error?error=no_context')
             .expect(500)
             .end(function(err, res) {

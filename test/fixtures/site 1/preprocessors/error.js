@@ -8,6 +8,8 @@ module.exports = function(context) {
     return '/redirected';
   case 'redirect_permanent':
     return [301, '/redirected'];
+  case 'invalid_redirect_array':
+    return ['/redirected'];
   case 'no_context':
     return;
   }
