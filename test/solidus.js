@@ -235,6 +235,16 @@ describe( 'Solidus', function(){
         });
     });
 
+    it( 'Sets noindex header for preview mode', function( done ){
+      var s_request = request( solidus_server.router );
+      s_request.get('/?is_preview=true')
+        .expect( 'x-robots-tag', /noindex/ )
+        .end( function( err, res ){
+          if (err) throw err;
+          done();
+        });
+    });
+
     it( 'Finds the list of partials used by each page', function(done) {
       var partials = ['partial1', 'partial2', 'partial3', 'partial/4', 'partial9', "partial'10", 'partial11', 'partial"12'];
       assert.deepEqual(solidus_server.views[solidus_server.pathFromPartialName('multiple_partials')].partials, partials);
@@ -329,6 +339,18 @@ describe( 'Solidus', function(){
               callback(err);
             });
         },
+        function(callback) {
+          // No errors with preview parameter
+          nock('https://solid.us').get('/error/mandatory?test=5').reply(401, {error: 'Nice try'});
+          nock('https://solid.us').get('/error/optional?test=5').reply(401, {error: 'Nice try'});
+          s_request.get('/with_resource_error.json?test=5&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              assert.equal(res.body.resources.mandatory, undefined);
+              assert.equal(res.body.resources.optional, undefined);
+              callback(err);
+            });
+        },
       ], function(err, results) {
         if (err) throw err;
         done();
@@ -415,6 +437,69 @@ describe( 'Solidus', function(){
             .expect(500)
             .end(function(err, res) {
               assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback();
+            });
+        }
+      ], function(err) {
+        if (err) throw err;
+        done();
+      });
+    });
+
+    it('Ignores preprocessor errors in preview mode', function(done) {
+      var s_request = request(solidus_server.router);
+      async.parallel([
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=exception&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=status_code&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=redirect&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=redirect_permanent&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=invalid_redirect_array&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
+              callback();
+            });
+        },
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=no_context&is_preview=true')
+            .expect(200)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('No error happened!') > -1);
               callback();
             });
         }
