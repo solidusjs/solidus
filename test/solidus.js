@@ -649,9 +649,9 @@ describe( 'Solidus', function(){
         .get('/')
         .expect( 'cache-control', 'public, max-age='+ ( 60 * 5 ) )
         .end( function( err, res ){
+          if( err ) throw err;
           assert( new Date( res.headers['last-modified'] ) < new Date );
           assert( new Date( res.headers['expires'] ) > new Date );
-          if( err ) throw err;
           done();
         });
     });
@@ -702,8 +702,10 @@ describe( 'Solidus', function(){
 
     describe( 'resource caching', function(){
 
+      var caching_route;
+
       function test_caching(cache1, cache2, callback) {
-        request(solidus_server.router).get('/caching.json').end(function(err, res) {
+        request(solidus_server.router).get(caching_route).end(function(err, res) {
           if (err) throw err;
           if (cache1) {
             assert.equal(res.body.resources.cache1.test, cache1);
@@ -720,13 +722,14 @@ describe( 'Solidus', function(){
       }
 
       beforeEach(function() {
-        nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
+        caching_route = '/caching.json';
       });
 
       it( 'Caches the resources', function( done ){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(1, 2, cb);
           },
           function(cb) {
@@ -739,6 +742,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 500, { test: 1 } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(null, 2, cb);
           },
           function(cb) {
@@ -752,6 +756,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, 'not json' );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(null, 2, cb);
           },
           function(cb) {
@@ -765,6 +770,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(1, 2, cb);
           },
           function(cb) {
@@ -781,6 +787,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(1, 2, cb);
           },
           function(cb1) {
@@ -812,6 +819,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(1, 2, cb);
           },
           function(cb) {
@@ -832,6 +840,7 @@ describe( 'Solidus', function(){
         async.series([
           function(cb) {
             nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
             test_caching(1, 2, cb);
           },
           function(cb) {
@@ -844,6 +853,26 @@ describe( 'Solidus', function(){
           },
           function(cb) {
             test_caching(4, 2, cb);
+          }
+          ], done);
+      });
+
+      it( 'Does not use a cached resource when a no-cache request header present', function( done ){
+        async.series([
+          function(cb) {
+            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 } );
+            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
+            caching_route = '/caching.json';
+            test_caching(1, 2, cb);
+          },
+          function(cb) {
+            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 3 } );
+            caching_route = '/no-cache.json';
+            test_caching(3, 2, cb);
+          },
+          function(cb) {
+            caching_route = '/caching.json';
+            test_caching(3, 2, cb);
           }
           ], done);
       });
@@ -974,6 +1003,35 @@ describe( 'Solidus', function(){
           .end(function(err, res) {
             if (err) throw err;
             assert.deepEqual(res.body, {test: 2});
+            done();
+          });
+      });
+    });
+
+    describe('no-cache request header', function() {
+      it('adds no-cache headers to resources', function(done) {
+        nock('https://solid.us').get('/cache?a=1').matchHeader('Cache-Control', 'no-cache').matchHeader('Pragma', 'no-cache').reply(200, {test: 1});
+        nock('https://solid.us').get('/cache?a=2').matchHeader('Cache-Control', 'no-cache').matchHeader('Pragma', 'no-cache').reply(200, {test: 2});
+
+        var s_request = request(solidus_server.router);
+        s_request.get('/caching')
+          .set('cache-control', 'no-cache')
+          .expect(200)
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+
+      it('adds no-cache headers to api resources', function(done) {
+        nock('https://solid.us').get('/api-resource').matchHeader('Cache-Control', 'no-cache').matchHeader('Pragma', 'no-cache').reply(200, {test: 2});
+
+        var s_request = request(solidus_server.router);
+        s_request.get('/api/resource.json?url=https://solid.us/api-resource')
+          .set('PRAGMA', 'no-cache')
+          .expect(200)
+          .end(function(err, res) {
+            if (err) throw err;
             done();
           });
       });
@@ -1188,11 +1246,11 @@ describe( 'Solidus', function(){
 
     it( 'Does not send cache headers in development', function( done ){
       var s_request = request( solidus_server.router );
-      s_request.get('/')
-        .expect( 'cache-control', null )
-        .expect( 'last-modified', null )
-        .expect( 'expires', null )
+      s_request.get('/dev')
+        .expect('cache-control', 'no-cache, no-store, max-age=0, must-revalidate')
+        .expect('x-robots-tag', 'noindex, nofollow')
         .end( function( err, res ){
+          if( err ) throw err;
           done();
         });
     });
@@ -1202,6 +1260,7 @@ describe( 'Solidus', function(){
       s_request.get('/scripts/test.js')
         .expect( 'cache-control', 'public, max-age=0' )
         .end( function( err, res ){
+          if( err ) throw err;
           done();
         });
     });
