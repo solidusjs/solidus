@@ -280,6 +280,20 @@ describe( 'Solidus', function(){
       });
     });
 
+    it( 'Sets request url as resource referer', function(done) {
+      nock('https://solid.us').get('/cache?a=1').matchHeader('Referer', 'http://some.domain.com:123/caching?a=1').reply( 200, { test: 1 } );
+      nock('https://solid.us').get('/cache?a=2').matchHeader('Referer', 'http://some.domain.com:123/caching?a=1').reply( 200, { test: 2 } );
+
+      var s_request = request(solidus_server.router);
+      s_request.get('/caching?a=1')
+        .set('Host', 'some.domain.com:123')
+        .expect(200)
+        .end(function(err, res) {
+          if (err) throw err;
+          done();
+        });
+    });
+
     it('Renders an error with error.hbs when a mandatory resource has an error', function(done) {
       var s_request = request(solidus_server.router);
       async.parallel([
