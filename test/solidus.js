@@ -662,7 +662,6 @@ describe( 'Solidus', function(){
         .expect( 'cache-control', 'public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400' )
         .end( function( err, res ){
           if( err ) throw err;
-          assert( new Date( res.headers['last-modified'] ) < new Date );
           assert( new Date( res.headers['expires'] ) > new Date );
           done();
         });
