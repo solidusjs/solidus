@@ -1,5 +1,5 @@
 const DEFAULT_ENCODING = 'UTF8';
-const FILESYSTEM_DELAY = 1100;
+const FILESYSTEM_DELAY = 150;
 
 var path = require('path');
 var assert = require('assert');
