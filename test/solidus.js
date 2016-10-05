@@ -370,7 +370,6 @@ describe( 'Solidus', function(){
     });
 
     it( 'Preprocesses the context of pages', function( done ){
-      this.timeout(11000); // /infinite.json should timeout after 10s
       var s_request = request( solidus_server.router );
       async.parallel([
         function( callback ){
@@ -383,23 +382,6 @@ describe( 'Solidus', function(){
               callback( err );
             });
         },
-        function( callback ){
-          s_request.get('/infinite.json')
-            .expect( 'Content-Type', /json/ )
-            .expect( 500 )
-            .end( function( err, res ){
-              if( err ) throw err;
-              assert( !res.body.test );
-              s_request.get('/.json')
-                .expect( 'Content-Type', /json/ )
-                .expect( 200 )
-                .end( function( err, res ){
-                  if( err ) throw err;
-                  assert( res.body.test === true );
-                  callback( err );
-                });
-            });
-        }
       ], function( err, results ){
         if( err ) throw err;
         done();
@@ -1055,7 +1037,6 @@ describe( 'Solidus', function(){
           .end( function( err, res ){
             if( err ) throw err;
             assert( res.body.test );
-            fs.unlinkSync('preprocessors/test.js');
             done();
           });
       }, FILESYSTEM_DELAY );
@@ -1225,24 +1206,22 @@ describe( 'Solidus', function(){
     it('Sends the logs to the web socket', function(done) {
       var socket = require('socket.io-client')('http://localhost:12345');
       socket.on('connect', function() {
-        // Our web socket client is connected, make a Solidus request then close the server
+        // Our web socket client is connected, make a Solidus request
         request(solidus_server.router).get('/helpers.json').end(function(err, res) {
           if (err) throw err;
           assert.equal(12345, res.body.log_server_port);
-          solidus_server.stop();
         });
       });
 
-      var last_message;
       socket.on('log', function(data) {
-        // Solidus emitted a log message, store it
-        last_message = data;
+        // Solidus emitted a log message, if it's the last message stop the server
+        if (data.level == 3 && /\/helpers \[200\] served in \d+ms/.test(data.message)) {
+          solidus_server.stop();
+        }
       });
 
       socket.on('disconnect', function() {
         // The log server was closed, we're done
-        assert.equal(3, last_message.level);
-        assert(/\/helpers \[200\] served in \d+ms/.test(last_message.message));
         done();
       });
     });
