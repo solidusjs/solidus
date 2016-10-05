@@ -1,42 +1,28 @@
 # Solidus
 
-## Major changes have been made to the way preprocessors work! [Read the new preprocessor documentation](#preprocessors)
-
-A simple [Node.js](http://nodejs.org/) server that generates sites from [Handlebars](http://handlebarsjs.com/) templates and JSON resources. Solidus helps you rapidly build sites by giving you a simple server you can run on both development machines and in production, along with customizable build scripts (via [Grunt](http://gruntjs.com)), and the ability to pull in content from any JSON API.
+A lightweight [Node.js][node] server that generates sites from [Handlebars](http://handlebarsjs.com/) templates and JSON resources pulled in from almost any API. For any high traffic applications it is best to use it as an origin for a CDN that can provide sufficient caching. It has run in production with [Fastly][fastly] and [Edgecast][edgecast], but has been especially tuned for use with Fastly.
 
 Awesome things you can do with Solidus:
 
-- Generate site routes from view paths
-- Fetch remote JSON for content
-- Automatically use scoped layouts
-- Create dynamic routes quickly and easily
-- Easily deploy to services like [Appfog](https://www.appfog.com/), [Heroku](https://www.heroku.com/), [Nodejitsu](https://www.nodejitsu.com/), [AWS](http://aws.amazon.com/), etc.
-- Generate new sites from site templates (via grunt-init)
+- [Define routes from the filesystem](#views) including dynamic segments
+- [Fetch JSON resources for content](#resources)
+- [Modify resource data](#preprocessors) with preprocessor functions
+- [Setup redirects](#redirects) with router access and scheduling options
+- Easily deploy to [Heroku](https://www.heroku.com/)
 
-Awesome things you can do with the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template):
-
-- Use your view templates client side (via Grunt)
-- [Livereload](http://livereload.com/) as you update your SASS/CSS (via Grunt)
-- Compile your styles/scripts into production bundles (via Grunt)
-
-## Installation
-
-To install Solidus:
+## Install
 
 - Install [Node.js](http://nodejs.org)
-- Run `npm install solidus -g`
-
-It should be installed! Go ahead and try `solidus -h` to see if it worked. You'll also want to make sure you have [Grunt](http://gruntjs.com) and [grunt-init](https://github.com/gruntjs/grunt-init) installed if you plan on using the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template).
+- Run `npm install solidus --save`
+- Run CLI commands from [npm scripts][npm-scripts]
 
 ## Usage
-
-Solidus has a command line interface (CLI), which means it's interface is entirely in the command line . Generally, you'll issue commands to solidus like so:
 
 ```
 solidus [command]
 ```
 
-Some commands (and solidus itself) have flags which can be used to pass parameters to commands. You can do that like so:
+Some commands (and Solidus itself) have flags which can be used to pass parameters to commands. You can do that like so:
 
 ```
 solidus [command] -[flag] [value]
@@ -54,6 +40,7 @@ You can also run Solidus manually in code if you need to. In order to do this, j
 
 ```js
 var solidus = require('solidus');
+
 solidus.start({
   port: 9001,
   dev: true
@@ -63,7 +50,7 @@ solidus.start({
 ## Commands
 
 ### start
-Starts a solidus server using the current folder.
+Starts a Solidus server using the current folder.
 
 - **--port, -p** specifies which port the Solidus server will listen on. By default it runs on port **8080**.
 - **--dev, -d** determines if the server runs in development mode or not. Development mode displays logging information and watches views/redirects/preprocessors for changes. This is set to **false** by default.
@@ -79,11 +66,12 @@ solidus start --loglevel 2
 
 ## Building a Solidus Site
 
-Solidus sites are comprised of **views**, **resources**, and **assets**. **Views** are [Handlebars](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, etc and the javascript preprocessors that normalize them. **Assets** are the CSS/SASS, javascripts, fonts, and images in a solidus site.
+Solidus sites are comprised of **views**, **resources**, and **assets**. **Views** are [Handlebars](http://handlebarsjs.com/) templates used for page, layout, and partial markup. **Resources** are JSON API responses from places like YouTube, Tumblr, etc and the JavaScript preprocessors that normalize them. **Assets** are the CSS, JavasCript, fonts, and images in a Solidus site.
 
 -----
 
 ### Views
+
 The `views` directory contains every *page*, *partial*, and *layout* in a site. Any view with the name `layout.hbs` will automatically become a *layout*. By default, *pages* will inherit the closest *layout* and use it, up to the root of the `views` directory. *Partials* and *pages* are identical and only differ in usage: you can use any view as a partial or a page.
 
 Every view in the `views` directory is available as a page. The routes of these pages are generated from their filename and location in the views directory. Here's a quick example:
@@ -172,7 +160,7 @@ Here's an example context:
 
 ### Resources
 
-Instead of keeping content in a database Solidus uses data from external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a handlebars template to make a page.
+Instead of keeping content in a database Solidus uses data from external APIs. Solidus requests JSON data from third party APIs, preprocesses it, then combines it with a Handlebars template to make a page.
 
 **Important:** API responses are cached, but expire in only a minute, meaning API requests very often. This may cause any rate limits to be quickly exceeded in production when a site is exposed to traffic. An API proxy is therefore highly recommended.
 
@@ -181,6 +169,7 @@ Here's a quick outline of how resources work:
 1) A resource is added to the configuration object of a page view:
 
 `kitties/index.hbs`
+
 ```html
 ...
   "resources": {
@@ -192,6 +181,7 @@ Here's a quick outline of how resources work:
 > Resources can also be specified with an options object instead of a string. This object must include `url`, and may include `headers` and `auth`. `headers` is an object of request headers, and `auth` is a string that represents an HTTP Auth parameter.
 
 `doges/index.hbs`
+
 ```html
 ...
   "resources": {
@@ -209,6 +199,7 @@ Here's a quick outline of how resources work:
 2) When the page is requested, the resources are fetched and their data is added to the `resources` object in the page's context. It looks something like this:
 
 Context in `/kitties`
+
 ```json
 {
   ...
@@ -236,6 +227,7 @@ Context in `/kitties`
 Sometimes resources will need to be requested with parameters that change dynamically. This can be done by using **dynamic segments** or **query parameters**. To create a dynamic resource, all you need to do is replace the dynamic part of your resource URL with a placeholder in curly braces (just like setting up dynamic routes). The name of the placeholder should match up with the name of the dynamic segment or query parameter you want to use to fill it in. In the event that a dynamic segment and query parameter have the same name, the query parameter will be used.
 
 `kitties/{resource_id}.hbs`
+
 ```json
 ...
   "resources": {
@@ -246,6 +238,7 @@ Sometimes resources will need to be requested with parameters that change dynami
 
 Context in `/kitties/635bc?order=alpha`
 (result from the resource: `https://example.come/api/v1/resources/635bc/kitties?order=alpha`)
+
 ```json
 {
   ...
@@ -264,6 +257,7 @@ Context in `/kitties/635bc?order=alpha`
 Certain resources will require an options, like a **query string** or **header**, in order to work. Since these resources can be used across many views, it can quickly get cumbersome to set these options every single time you include a resource. To fix this problem, you can set options for a resource (or group of resources) based on their url globally, using `auth.json`. This file is a set of resource configurations that will be mixed in to resources before they are fetched. Here's a simple example:
 
 `auth.json`
+
 ```json
 {
   "http://proxy.storyteller.io/*": {
@@ -286,7 +280,8 @@ Now any resource that starts with `http://proxy.storyteller.io/` will mix in the
 If the data returned in a resource isn't quite right for a template, a **preprocessor** can be used to make the data more palatable. Preprocessors are run after resources are requested, but before pages are rendered, so they can be used to transform data, add new data, merge two resources together, and more. All preprocessors are placed in a site's `preprocessors` directory, and are enabled by specifying them in the `preprocessor` option in the view configuration. Preprocessors are simply [CommonJS modules](http://dailyjs.com/2010/10/18/modules/) that export a function which modifies and returns the page's `context`. Here's a quick example of a preprocessor that converts the name of the kitties to ALL CAPS:
 
 `preprocessors/kitties.js`
-```javascript
+
+```JavaScript
 module.exports = function( context ){
   for( var i in context.resources.kitties.results ){
     context.resources.kitties.results[i] = context.resources.kitties.results[i].toUpperCase();
@@ -296,6 +291,7 @@ module.exports = function( context ){
 ```
 
 `views/kitties/index.hbs`
+
 ```html
 ...
   "resources": {
@@ -306,6 +302,7 @@ module.exports = function( context ){
 ```
 
 Original context in `/kitties`
+
 ```json
 {
   ...
@@ -319,6 +316,7 @@ Original context in `/kitties`
 ```
 
 Processed context in `/kitties`
+
 ```json
 {
   ...
@@ -335,6 +333,7 @@ By default, the following libraries are available for use in preprocessors by us
 
 
 `preprocessors/kitties.js`
+
 ```js
 var _ = require('underscore');
 module.exports = function( context ){
@@ -344,6 +343,7 @@ module.exports = function( context ){
 ```
 
 Processed context in `/kitties`
+
 ```json
 {
   ...
@@ -360,7 +360,7 @@ Processed context in `/kitties`
 
 ### Redirects
 
-Redirects can easily be defined using the `redirects.js` file located in the base of the Solidus site's directory. This file simply exports an array of redirection objects with the parameters `from`, `to`, `start`, `end`, and `permanent`. `from` is the route you want to redirect from, and `to` is the target destination. `Start` and `end` are datetimes that correspond with when the redirection should be active and are in `YYYY-MM-DD HH:MM:SS` format. By default all redirects will be **302 Found**, but if `permanent` is true they will be served as **301 Moved Permanently**.
+Redirects can easily be defined using the `redirects.js` file located in the base of the Solidus site's directory. This file simply exports an array of redirection objects with the parameters `from`, `to`, `start`, `end`, and `permanent`. `from` is the route you want to redirect from, and `to` is the target destination. `start` and `end` are datetimes that correspond with when the redirection should be active and are in `YYYY-MM-DD HH:MM:SS` format. By default all redirects will be **302 Found**, but if `permanent` is true they will be served as **301 Moved Permanently**.
 
 Here's an example `redirects.js`:
 
@@ -406,14 +406,21 @@ module.exports = [
 
 -----
 
-### Assets and Grunt
+### Assets
 
-Solidus has the capability to serve any static resource you choose, be it stylesheets, javascripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory, and Solidus will serve them up.
-
-Solidus uses Grunt to compile SASS, client side templates, and run other client-side tasks. An ideal `Gruntfile` is included with the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template), but any gruntfile or build system can be used. For more information on using Grunt for asset compilation and management in a Solidus site, see the [Solidus Site Template](https://github.com/solidusjs/solidus-site-template) documentation.
+Solidus has the capability to serve any static resource you choose, be it stylesheets, JavaScripts, images, fonts, flash files, etc. Just place your assets in the `assets` directory or setup the build output from tools like [Gulp][gulp] and [Grunt][grunt], and Solidus will serve them up.
 
 =======
 
 ### Tests
 
 Solidus uses [mocha](https://github.com/visionmedia/mocha) to run its tests. Any new features should be tested, and resolved bugs should have tests to prevent regression. Tests can be run with the `mocha` command.
+
+
+[node]: http://nodejs.org/
+[handlebars]: http://handlebarsjs.com/
+[fastly]: https://www.fastly.com/
+[edgecast]: https://www.verizondigitalmedia.com/platform/edgecast-cdn/
+[npm-scripts]: https://docs.npmjs.com/misc/scripts
+[gulp]: http://gulpjs.com/
+[grunt]: http://gruntjs.com/
