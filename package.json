@@ -5,10 +5,17 @@
     "url": "https://github.com/solidusjs/solidus/issues"
   },
   "author": {
-    "name": "Timothy Kempf",
-    "email": "tim@sparkart.com",
-    "url": "http://sparkart.com"
+    "name": "Sparkart Group, Inc.",
+    "email": "developers@sparkart.com",
+    "url": "http://developers.sparkart.com"
   },
+  "contributors": [{
+    "name": "Timothy Kempf"
+	}, {
+    "name": "Joannic Laborde"
+	}, {
+    "name": "Eric Lanehart"
+  }],
   "license": "MIT",
   "main": "solidus.js",
   "repository": {
