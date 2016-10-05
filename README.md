@@ -1,5 +1,7 @@
 # Solidus
 
+[![CircleCI Status][circleci-badge]][circleci]
+
 A lightweight [Node.js][node] server that generates sites from [Handlebars](http://handlebarsjs.com/) templates and JSON resources pulled in from almost any API. For any high traffic applications it is best to use it as an origin for a CDN that can provide sufficient caching. It has run in production with [Fastly][fastly] and [Edgecast][edgecast], but has been especially tuned for use with Fastly.
 
 Awesome things you can do with Solidus:
@@ -417,6 +419,8 @@ Solidus has the capability to serve any static resource you choose, be it styles
 
 Solidus uses [mocha](https://github.com/visionmedia/mocha) to run its tests. Any new features should be tested, and resolved bugs should have tests to prevent regression. Tests can be run with the `mocha` command.
 
+[circleci]: https://circleci.com/gh/solidusjs/solidus
+[circleci-badge]: https://circleci.com/gh/solidusjs/solidus.png?style=shield&circle-token=df44f238db22ef6b70d50d93cc5d0d811b1843dd
 
 [npm]: https://docs.npmjs.com/getting-started/what-is-npm
 [node]: http://nodejs.org/
