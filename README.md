@@ -14,7 +14,7 @@ Awesome things you can do with Solidus:
 
 - Install [Node.js](http://nodejs.org)
 - Run `npm install solidus --save`
-- Run CLI commands from [npm scripts][npm-scripts]
+- Use the CLI from [npm scripts][npm-scripts]
 
 ## Usage
 
@@ -329,8 +329,9 @@ Processed context in `/kitties`
 }
 ```
 
-By default, the following libraries are available for use in preprocessors by using the `require` method: [Underscore](http://underscorejs.org/), [Moment](http://momentjs.com/), [XDate](http://arshaw.com/xdate/), and [Sugar](http://sugarjs.com/). Additional node.js libraries can be added by adding them to your site's `package.json`, installing them, and `require`ing them in your preprocessor. Here's a quick example:
+Preprocessors are Node.js modules like any other. [Search npm][npm] to find libraries solving common problems in areas like time, data manipulation, text formatting, and many more. [Node.js built-in modules][node-api] are also available. 
 
+Here's a quick example:
 
 `preprocessors/kitties.js`
 
@@ -417,7 +418,9 @@ Solidus has the capability to serve any static resource you choose, be it styles
 Solidus uses [mocha](https://github.com/visionmedia/mocha) to run its tests. Any new features should be tested, and resolved bugs should have tests to prevent regression. Tests can be run with the `mocha` command.
 
 
+[npm]: https://docs.npmjs.com/getting-started/what-is-npm
 [node]: http://nodejs.org/
+[node-api]: https://nodejs.org/api/
 [handlebars]: http://handlebarsjs.com/
 [fastly]: https://www.fastly.com/
 [edgecast]: https://www.verizondigitalmedia.com/platform/edgecast-cdn/
