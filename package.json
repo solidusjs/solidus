@@ -24,8 +24,6 @@
     "commander": "1.1.x",
     "colors": "~0.6.x",
     "sandbox": "~0.8.3",
-    "sugar": "~1.3.8",
-    "xdate": "~0.8.0",
     "moment": "~2.0.0",
     "chokidar": "~0.6.2",
     "connect": "~2.8.4",
