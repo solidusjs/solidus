@@ -13,7 +13,6 @@ var timekeeper = require('timekeeper');
 var solidus = require('../solidus.js');
 var SolidusServer = require('../lib/server.js');
 var Page = require('../lib/page.js');
-var CachedResource = require('../lib/cached_resource.js');
 
 var original_path = __dirname;
 var site1_path = path.join( original_path, 'fixtures', 'site 1' );
@@ -70,7 +69,6 @@ describe( 'Solidus', function(){
       }];
       var combined_redirects = JSON.stringify( temporal_redirects.concat( overlapping_redirects ) );
       fs.appendFileSync( 'redirects.js', ';module.exports = module.exports.concat(' + combined_redirects + ');', DEFAULT_ENCODING );
-      CachedResource.cache.reset();
 
       // mock http endpoints for resources
       nock('https://solid.us').get('/basic/1').reply( 200, { test: true } );
@@ -657,18 +655,90 @@ describe( 'Solidus', function(){
         });
     });
 
-    it( 'Sends appropriate cache headers with pages', function( done ){
-      var s_request = request( solidus_server.router );
-      s_request
-        .get('/')
-        .expect( 'cache-control', 'public, max-age='+ ( 60 * 5 ) )
-        .end( function( err, res ){
-          if( err ) throw err;
-          assert( new Date( res.headers['last-modified'] ) < new Date );
-          assert( new Date( res.headers['expires'] ) > new Date );
-          done();
-        });
-    });
+    describe('Sends appropriate cache headers with pages', function() {
+      var now;
+
+      beforeEach(function() {
+        now = new Date().getTime()
+        timekeeper.freeze(now);
+      });
+
+      afterEach(function() {
+        timekeeper.reset();
+      });
+
+      it( '5 minutes for pages without resources', function( done ){
+        var s_request = request( solidus_server.router );
+        s_request
+          .get('/partial')
+          .expect( 'cache-control', 'public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400' )
+          .expect( 'expires', new Date(now + 300 * 1000).toUTCString() )
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+
+      it( 'nearest resource expiration for pages with resources', function( done ){
+        nock('https://solid.us').get('/cache?a=1').reply(200, {test: 1}, {'Cache-Control': 'max-age=111'});
+        nock('https://solid.us').get('/cache?a=2').reply(200, {test: 2}, {'Cache-Control': 'max-age=222'});
+
+        var s_request = request( solidus_server.router );
+        s_request
+          .get('/caching')
+          .expect( 'cache-control', 'public, max-age=111, stale-while-revalidate=86400, stale-if-error=86400' )
+          .expect( 'expires', new Date(now + 111 * 1000).toUTCString() )
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+
+      it( 'ignores resources with expiration higher than 5 minutes', function( done ){
+        nock('https://solid.us').get('/cache?a=1').reply(200, {test: 1}, {'Cache-Control': 'max-age=1111'});
+        nock('https://solid.us').get('/cache?a=2').reply(200, {test: 2}, {'Cache-Control': 'max-age=222'});
+
+        var s_request = request( solidus_server.router );
+        s_request
+          .get('/caching')
+          .expect( 'cache-control', 'public, max-age=222, stale-while-revalidate=86400, stale-if-error=86400' )
+          .expect( 'expires', new Date(now + 222 * 1000).toUTCString() )
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+
+      it( 'ignores resources without expiration', function( done ){
+        nock('https://solid.us').get('/cache?a=1').reply(200, {test: 1});
+        nock('https://solid.us').get('/cache?a=2').reply(200, {test: 2}, {'Cache-Control': 'max-age=222'});
+
+        var s_request = request( solidus_server.router );
+        s_request
+          .get('/caching')
+          .expect( 'cache-control', 'public, max-age=222, stale-while-revalidate=86400, stale-if-error=86400' )
+          .expect( 'expires', new Date(now + 222 * 1000).toUTCString() )
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+
+      it( 'ignores bad resources with expiration', function( done ){
+        nock('https://solid.us').get('/cache?a=1').reply(400, {test: 1}, {'Cache-Control': 'max-age=111'});
+        nock('https://solid.us').get('/cache?a=2').reply(200, {test: 2}, {'Cache-Control': 'max-age=222'});
+
+        var s_request = request( solidus_server.router );
+        s_request
+          .get('/caching')
+          .expect( 'cache-control', 'public, max-age=222, stale-while-revalidate=86400, stale-if-error=86400' )
+          .expect( 'expires', new Date(now + 222 * 1000).toUTCString() )
+          .end( function( err, res ){
+            if( err ) throw err;
+            done();
+          });
+      });
+    })
 
     it( 'Runs helpers after preprocessors', function( done ){
       var s_request = request( solidus_server.router );
@@ -712,185 +782,6 @@ describe( 'Solidus', function(){
           if (err) throw err;
           done();
         });
-    });
-
-    describe( 'resource caching', function(){
-
-      var caching_route;
-
-      function test_caching(cache1, cache2, callback) {
-        request(solidus_server.router).get(caching_route).end(function(err, res) {
-          if (err) throw err;
-          if (cache1) {
-            assert.equal(res.body.resources.cache1.test, cache1);
-          } else {
-            assert(!res.body.resources.cache1);
-          }
-          if (cache2) {
-            assert.equal(res.body.resources.cache2.test, cache2);
-          } else {
-            assert(!res.body.resources.cache2);
-          }
-          callback();
-        });
-      }
-
-      beforeEach(function() {
-        caching_route = '/caching.json';
-      });
-
-      it( 'Caches the resources', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            test_caching(1, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Does not cache resources with invalid status codes', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 500, { test: 1 } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(null, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 3 } );
-            test_caching(3, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Does not cache resources with invalid data', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, 'not json' );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(null, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 3 } );
-            test_caching(3, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Renders expired cached resources before refreshing them', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 3 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            test_caching(3, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Locks expired cached resources while being refreshed', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb1) {
-            // Delay the response, to make sure the next request comes in before the first one is refreshed
-            nock('https://solid.us').get('/cache?a=1').delay(25).reply( 200, { test: 3 }, { 'Cache-Control': 'max-age=0' } );
-            async.parallel([
-              function(cb2) {
-                test_caching(1, 2, cb2);
-              },
-              function(cb2) {
-                test_caching(1, 2, cb2);
-              }
-              ], cb1);
-          },
-          function(cb) {
-            // The previous requests are done, but the refresh might not, wait to make sure the lock is released
-            setTimeout(function() {
-              nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 4 } );
-              test_caching(3, 2, cb);
-            }, 50);
-          },
-          function(cb) {
-            test_caching(4, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Unlocks expired cached resources with invalid status codes', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 500, { test: 3 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 4 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            test_caching(4, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Unlocks expired cached resources with invalid data', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 }, { 'Cache-Control': 'max-age=0' } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, 'not json' );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 4 } );
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            test_caching(4, 2, cb);
-          }
-          ], done);
-      });
-
-      it( 'Does not use a cached resource when a no-cache request header present', function( done ){
-        async.series([
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 1 } );
-            nock('https://solid.us').get('/cache?a=2').reply( 200, { test: 2 } );
-            caching_route = '/caching.json';
-            test_caching(1, 2, cb);
-          },
-          function(cb) {
-            nock('https://solid.us').get('/cache?a=1').reply( 200, { test: 3 } );
-            caching_route = '/no-cache.json';
-            test_caching(3, 2, cb);
-          },
-          function(cb) {
-            caching_route = '/caching.json';
-            test_caching(3, 2, cb);
-          }
-          ], done);
-      });
-
     });
 
     describe('/api/resource.json', function() {
@@ -960,7 +851,7 @@ describe( 'Solidus', function(){
 
         var s_request = request(solidus_server.router);
         s_request.get('/api/resource.json?url=https://solid.us/api-resource')
-          .expect('Cache-Control', 'public, max-age=123')
+          .expect('Cache-Control', 'public, max-age=123, stale-while-revalidate=86400, stale-if-error=86400')
           .expect('Expires', new Date(new Date().getTime() + 123 * 1000).toUTCString())
           .end(function(err, res) {
             if (err) throw err;
@@ -973,8 +864,8 @@ describe( 'Solidus', function(){
 
         var s_request = request(solidus_server.router);
         s_request.get('/api/resource.json?url=https://solid.us/api-resource')
-          .expect('Cache-Control', 'public, max-age=60')
-          .expect('Expires', new Date(new Date().getTime() + 60 * 1000).toUTCString())
+          .expect('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400')
+          .expect('Expires', new Date(new Date().getTime() + 5 * 60 * 1000).toUTCString())
           .end(function(err, res) {
             if (err) throw err;
             done();
@@ -986,7 +877,7 @@ describe( 'Solidus', function(){
 
         var s_request = request(solidus_server.router);
         s_request.get('/api/resource.json?url=https://solid.us/api-resource')
-          .expect('Cache-Control', 'public, max-age=123')
+          .expect('Cache-Control', 'public, max-age=123, stale-while-revalidate=86400, stale-if-error=86400')
           .expect('Expires', new Date(new Date().getTime() + 123 * 1000).toUTCString())
           .end(function(err, res) {
             if (err) throw err;
@@ -999,7 +890,7 @@ describe( 'Solidus', function(){
 
         var s_request = request(solidus_server.router);
         s_request.get('/api/resource.json?url=https://solid.us/api-resource')
-          .expect('Cache-Control', 'public, max-age=0')
+          .expect('Cache-Control', 'public, max-age=0, stale-while-revalidate=86400, stale-if-error=86400')
           .expect('Expires', new Date().toUTCString())
           .end(function(err, res) {
             if (err) throw err;
