@@ -1042,18 +1042,33 @@ describe( 'Solidus', function(){
       }, FILESYSTEM_DELAY );
     });
 
-    var test_preprocessor_contents_2 = 'module.exports=function(context){context.test2 = true;return context;};';
+    var parent_preprocessor_contents = 'var child = require("./child");module.exports=function(context){context.test = child();return context;};';
+    var child_preprocessor_contents = 'module.exports=function(){return "ok";};';
+    var child_preprocessor_contents_2 = 'module.exports=function(){return "okok";};';
 
-    it( 'Updates preprocessors when their files change', function( done ){
+    it( 'Invalidates all cached preprocessor modules on a change to any of them', function( done ){
+      this.timeout(FILESYSTEM_DELAY * 2.5);
       var s_request = request( solidus_server.router );
-      fs.writeFileSync( 'preprocessors/test.js', test_preprocessor_contents_2, DEFAULT_ENCODING );
+      fs.writeFileSync( 'preprocessors/test.js', parent_preprocessor_contents, DEFAULT_ENCODING );
+      fs.writeFileSync( 'preprocessors/child.js', child_preprocessor_contents, DEFAULT_ENCODING );
       setTimeout( function(){
         s_request.get('/test.json')
           .expect( 200 )
           .end( function( err, res ){
             if( err ) throw err;
-            assert( res.body.test2 );
-            done();
+            assert( res.body.test === 'ok' );
+
+            fs.writeFileSync( 'preprocessors/child.js', child_preprocessor_contents_2, DEFAULT_ENCODING );
+
+            setTimeout( function(){
+              s_request.get('/test.json')
+                .expect( 200 )
+                .end( function( err, res ){
+                  if( err ) throw err;
+                  assert( res.body.test === 'okok' );
+                  done();
+                });
+            }, FILESYSTEM_DELAY );
           });
       }, FILESYSTEM_DELAY );
     });
