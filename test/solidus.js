@@ -503,6 +503,39 @@ describe( 'Solidus', function(){
       });
     });
 
+    it('Renders error.hbs when an error occurs', function(done) {
+      var s_request = request(solidus_server.router);
+      async.parallel([
+        // Error while rendering page
+        function(callback) {
+          s_request.get('/with_preprocessor_error?error=exception')
+            .expect(500)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('<title>Original title</title>') > -1); // Original page title
+              assert(res.text.indexOf('Oh no (500)!') > -1); // Error page content
+              assert(res.text.indexOf('Le undefined sacrebleu !') > -1); // Helper used in error page
+              callback();
+            });
+        },
+        // Missing page
+        function(callback) {
+          s_request.get('/doesnotexist')
+            .expect(404)
+            .end(function(err, res) {
+              if( err ) throw err;
+              assert(res.text.indexOf('<title>Error title</title>') > -1); // Error page title
+              assert(res.text.indexOf('Not here!') > -1); // Error page content
+              assert(res.text.indexOf('Le undefined sacrebleu !') > -1); // Helper used in error page
+              callback();
+            });
+        },
+      ], function(err) {
+        if (err) throw err;
+        done();
+      });
+    });
+
     it( 'Serves assets in /assets', function( done ){
       var s_request = request( solidus_server.router );
       async.parallel([
@@ -1066,6 +1099,7 @@ describe( 'Solidus', function(){
                 .end( function( err, res ){
                   if( err ) throw err;
                   assert( res.body.test === 'okok' );
+                  fs.unlinkSync('preprocessors/child.js');
                   done();
                 });
             }, FILESYSTEM_DELAY );
