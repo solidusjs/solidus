@@ -1,5 +1,14 @@
+{{!
+{
+  "title": "Error title"
+}
+}}
+
 {{# equal error.status 404 }}
   Not here!
 {{ else }}
   Oh no ({{ error.status }})!
 {{/ equal }}
+
+{{! Site helper }}
+{{frenchify test_string}}
