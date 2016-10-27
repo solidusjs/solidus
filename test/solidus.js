@@ -322,9 +322,21 @@ describe( 'Solidus', function(){
           nock('https://solid.us').get('/error/mandatory?test=3').reply(401, {error: 'Nice try'});
           nock('https://solid.us').get('/error/optional?test=3').reply(200, {test: 3});
           s_request.get('/with_resource_error?test=3')
-            .expect(401)
+            .expect(500)
             .end(function(err, res) {
-              assert(res.text.indexOf('Oh no (401)!') > -1);
+              assert(res.text.indexOf('Oh no (500)!') > -1);
+              callback(err);
+            });
+        },
+        function(callback) {
+          // Bad status is available in context
+          nock('https://solid.us').get('/error/mandatory?test=3').reply(401, {error: 'Nice try'});
+          nock('https://solid.us').get('/error/optional?test=3').reply(200, {test: 3});
+          s_request.get('/with_resource_error.json?test=3')
+            .expect(500)
+            .end(function(err, res) {
+              assert.equal(res.body.error.status, 500);
+              assert.equal(res.body.error.message.status, 401);
               callback(err);
             });
         },
@@ -1219,9 +1231,9 @@ describe( 'Solidus', function(){
           nock('https://solid.us').get('/error/mandatory?test=3').reply(401, {error: 'Nice try'});
           nock('https://solid.us').get('/error/optional?test=3').reply(200, {test: 3});
           s_request.get('/with_resource_error?test=3')
-            .expect(401)
+            .expect(500)
             .end(function(err, res) {
-              assert.equal(res.text, '401 Unauthorized');
+              assert.equal(res.text, '500 Internal Server Error');
               callback(err);
             });
         }
