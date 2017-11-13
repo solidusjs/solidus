@@ -584,6 +584,26 @@ describe( 'Solidus', function(){
           s_request.get('/redirect9/12-34-56-78').expect( 'location', '/new/56/12/1078', callback );
         },
         function( callback ){
+          s_request.get('/match-http-root?with=params').set('Host', 'solidusjs.com').expect( 'location', '/new/match-http-root', callback );
+        },
+        function( callback ){
+          // Bad protocol
+          s_request.get('/match-https-root?with=params').set('Host', 'solidusjs.com').expect( 404, callback );
+        },
+        function( callback ){
+          // Bad host
+          s_request.get('/match-http-root?with=params').set('Host', 'www.solidusjs.com').expect( 404, callback );
+        },
+        function( callback ){
+          s_request.get('/some/path?with=params').set('Host', 'no-path.com').expect( 'location', 'http://www.no-path.com/some/path?with=params', callback );
+        },
+        function( callback ){
+          s_request.get('/to-https-www?with=params').set('Host', 'solidusjs.com').expect( 'location', 'https://www.solidusjs.com/to-https-www?with=params', callback );
+        },
+        function( callback ){
+          s_request.get('/to-https-www-url/old-path?with=params').set('Host', 'solidusjs.com').expect( 'location', 'https://www.solidusjs.com/new/url/old-path', callback );
+        },
+        function( callback ){
           s_request.get('/past-redirect').expect( 404, callback );
         },
         function( callback ){

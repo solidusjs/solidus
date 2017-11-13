@@ -34,4 +34,38 @@ module.exports = [
   to: function(params) {
     return "/new/{1}/{0}/" + (1000 + parseInt(params['2']));
   }
+}, {
+  from: {
+    protocol: 'http',
+    host: 'solidusjs.com',
+    path: '/match-http-root'
+  },
+  to: '/new/match-http-root'
+}, {
+  from: {
+    protocol: 'https',
+    host: 'solidusjs.com',
+    path: '/match-https-root'
+  },
+  to: '/new/match-https-root'
+}, {
+  from: {
+    host: 'no-path.com'
+  },
+  to: {
+    host: 'www.no-path.com'
+  }
+}, {
+  from: '/to-https-www',
+  to: {
+    protocol: 'https',
+    host: 'www.solidusjs.com'
+  }
+}, {
+  from: '/to-https-www-url/{dynamic}',
+  to: {
+    protocol: 'https',
+    host: 'www.solidusjs.com',
+    url: '/new/url/{dynamic}'
+  }
 }];
