@@ -1,5 +1,0 @@
-machine:
-  node:
-    version: v4.8.4
-  npm:
-    version: v2.15.11
