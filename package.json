@@ -31,7 +31,7 @@
     "moment": "~2.0.0",
     "raven": "^0.6.2",
     "socket.io": "~1.0.6",
-    "solidus-client": "^1.4.0",
+    "solidus-client": "^1.4.1",
     "underscore": "^1.6.0"
   },
   "devDependencies": {
